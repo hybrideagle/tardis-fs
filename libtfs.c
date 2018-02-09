@@ -1,4 +1,7 @@
+//%cflags:  -D_FILE_OFFSET_BITS=64 -I/usr/include/fuse -lfuse -pthread
+
 #include "libtfs.h"
+#include <string.h>
 
 int read_from_block(blockno_t n, char* buffer, int bytes, int offset){
 
@@ -17,7 +20,11 @@ int write_to_path(char* path, char* buffer, int bytes, int offset){
 }
 
 blockno_t get_first_block_from_path(char* path){
-
+        for(inode_t inode = 0; inode<NUM_FILES; inode++) {
+                if(strcmp(files[inode].path,path)==0) {
+                        return get_first_block_from_inode(inode);
+                }
+        }
 }
 
 blockno_t get_first_block_from_inode(inode_t inode){
@@ -28,10 +35,44 @@ blockno_t get_next_block(blockno_t blockno){
         return blocks[blockno].next;
 }
 
+blockno_t get_first_free_block(){
+        for(blockno_t i = 0;i<NUM_BLOCKS;i++){
+                if(!blocks[i].allocated){
+                        return i;
+                }
+        }
+}
+
+bool delete_block_chain(blockno_t start_block){
+        blockno_t curr_block = start_block;
+        do{
+                blocks[curr_block].next = -1;
+                blocks[curr_block].allocated = false;
+                curr_block = blocks[curr_block].next;
+        }
+        while(curr_block != -1);
+
+
+}
+
 inode_t create_file(char* path){
+        for(inode_t inode = 0;inode < NUM_FILES;inode++){
+                if(!files[inode].used){
+                        files[inode].used = true;
+                        files[inode].path = path;
+                        files[inode].start_block = get_first_free_block();
+                }
+        }
 }
 
 int delete_file(char* path){
+        for(inode_t inode = 0;inode < NUM_FILES;inode++){
+                if(!files[inode].used){
+                        files[inode].used = false;
+                        free(files[inode].path);
+                        delete_block_chain(files[inode].start_block);
+                }
+        }
 }
 
 void init_tfs(char* path){
