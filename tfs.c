@@ -1,489 +1,224 @@
-/*
-  FUSE: Filesystem in Userspace
-  Copyright (C) 2001-2007  Miklos Szeredi <miklos@szeredi.hu>
-  Copyright (C) 2011       Sebastian Pipping <sebastian@pipping.org>
+#define FUSE_USE_VERSION 30
 
-  This program can be distributed under the terms of the GNU GPL.
-  See the file COPYING.
-*/
-
-/** @file
- *
- * This file system mirrors the existing file system hierarchy of the
- * system, starting at the root file system. This is implemented by
- * just "passing through" all requests to the corresponding user-space
- * libc functions. Its performance is terrible.
- *
- * Compile with
- *
- *     gcc -Wall tfs.c `pkg-config fuse3 --cflags --libs` -o tfs
- *
- * ## Source code ##
- * \include tfs.c
- */
-
-
-#define FUSE_USE_VERSION 31
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#ifdef linux
-/* For pread()/pwrite()/utimensat() */
-#define _XOPEN_SOURCE 700
-#endif
-
+#include <unistd.h>
 #include <fuse.h>
 #include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include <sys/types.h>
 #include <sys/stat.h>
-#include <dirent.h>
+#include <time.h>
+#include <string.h>
+#include <stdlib.h>
 #include <errno.h>
-#include <sys/time.h>
-#ifdef HAVE_SETXATTR
-#include <sys/xattr.h>
-#endif
+#include "libtfs.h"
 
-static void *tfs_init(struct fuse_conn_info *conn,
-		      struct fuse_config *cfg)
+
+const char* name[100];
+const char* content[100];
+int ilen = 0;
+
+void insert(char* path)
 {
-	(void) conn;
-	cfg->use_ino = 1;
-
-	/* Pick up changes from lower filesystem right away. This is
-	   also necessary for better hardlink support. When the kernel
-	   calls the unlink() handler, it does not know the inode of
-	   the to-be-removed entry and can therefore not invalidate
-	   the cache of the associated inode - resulting in an
-	   incorrect st_nlink value being reported for any remaining
-	   hardlinks to this inode. */
-	cfg->entry_timeout = 0;
-	cfg->attr_timeout = 0;
-	cfg->negative_timeout = 0;
-
-	return NULL;
+        name[ilen] = strdup(path);
+        ilen++;
 }
 
-static int tfs_getattr(const char *path, struct stat *stbuf,
-		       struct fuse_file_info *fi)
+const char* get(int inode)
 {
-	(void) fi;
-	int res;
-
-	res = lstat(path, stbuf);
-	if (res == -1)
-		return -errno;
-
-	return 0;
+        return name[inode];
 }
 
-static int tfs_access(const char *path, int mask)
+const char* iread(int inode)
 {
-	int res;
-
-	res = access(path, mask);
-	if (res == -1)
-		return -errno;
-
-	return 0;
+        return content[inode];
 }
 
-static int tfs_readlink(const char *path, char *buf, size_t size)
+void iwrite(int inode,char* text)
 {
-	int res;
-
-	res = readlink(path, buf, size - 1);
-	if (res == -1)
-		return -errno;
-
-	buf[res] = '\0';
-	return 0;
+        content[inode] = strdup(text);
 }
 
-
-static int tfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-		       off_t offset, struct fuse_file_info *fi,
-		       enum fuse_readdir_flags flags)
+static int do_getattr( const char *path, struct stat *st )
 {
-	DIR *dp;
-	struct dirent *de;
+        printf( "[getattr] Called\n" );
+        printf( "\tAttributes of %s requested\n", path );
+        st->st_uid = getuid();
+        st->st_gid = getgid();
+        st->st_atime = time(NULL);
+        st->st_mtime = time(NULL);
 
-	(void) offset;
-	(void) fi;
-	(void) flags;
-
-	dp = opendir(path);
-	if (dp == NULL)
-		return -errno;
-
-	while ((de = readdir(dp)) != NULL) {
-		struct stat st;
-		memset(&st, 0, sizeof(st));
-		st.st_ino = de->d_ino;
-		st.st_mode = de->d_type << 12;
-		if (filler(buf, de->d_name, &st, 0, 0))
-			break;
-	}
-
-	closedir(dp);
-	return 0;
+        if ( strcmp( path, "/" ) == 0 )
+        {
+                st->st_mode = S_IFDIR | 0777;
+                st->st_nlink = 2;
+                return 0;
+        }
+        else
+        {
+                st->st_mode = S_IFREG | 0777;
+                st->st_nlink = 1;
+                st->st_size = 1024;
+        }
+        int i = 0,j = 0;
+        for(i=0; i<ilen; i++)
+        {
+                printf("%s,%s\n",strdup(path),get(i));
+                char fpath[10];
+                fpath[0] = '/';
+                strcat(fpath,get(i));
+                char* fpath2 = fpath;
+                if(strcmp(path,fpath2)==0)
+                {
+                        printf("%s Found\n",strdup(path));
+                        return 0;
+                }
+                for(j=0; j<10; j++)
+                {
+                        fpath[j]='\0';
+                }
+        }
+        printf("%s Not Found\n",strdup(path));
+        return -ENOENT;
 }
 
-static int tfs_mknod(const char *path, mode_t mode, dev_t rdev)
+static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi )
 {
-	int res;
+        int i;
+        printf( "--> Getting The List of Files of %s\n", path );
 
-	/* On Linux this could just be 'mknod(path, mode, rdev)' but this
-	   is more portable */
-	if (S_ISREG(mode)) {
-		res = open(path, O_CREAT | O_EXCL | O_WRONLY, mode);
-		if (res >= 0)
-			res = close(res);
-	} else if (S_ISFIFO(mode))
-		res = mkfifo(path, mode);
-	else
-		res = mknod(path, mode, rdev);
-	if (res == -1)
-		return -errno;
+        for(i = 0; i<ilen; i++)
+        {
+                filler( buffer, get(i), NULL, 0 );
+        }
+        return 0;
 
-	return 0;
 }
 
-static int tfs_mkdir(const char *path, mode_t mode)
+static int do_read( const char *path, char *buffer, size_t size, off_t offset, struct fuse_file_info *fi )
 {
-	int res;
+        int i,j;
+        printf( "--> Trying to read %s, %lu, %lu\n", path, offset, size );
+        char *selectedText = NULL;
 
-	res = mkdir(path, mode);
-	if (res == -1)
-		return -errno;
+        for(i=0; i<ilen; i++)
+        {
+                char fpath[10];
+                fpath[0] = '/';
+                strcat(fpath,get(i));
+                char* fpath2 = fpath;
+                //printf("\n%s\n",fpath2);
+                if(strcmp(path,fpath2)==0)
+                {
+                        selectedText = strdup(iread(i));
+                        break;
+                }
+                for(j=0; j<10; j++)
+                {
+                        fpath[j]='\0';
+                }
+        }
+        printf("\n%s\n",selectedText);
 
-	return 0;
+        if(selectedText == NULL)
+                return -1;
+
+        memcpy( buffer, selectedText + offset, size );
+        return strlen( selectedText ) - offset;
 }
 
-static int tfs_unlink(const char *path)
+const int do_truncate(const char *path, off_t offset, struct fuse_file_info *fi)
 {
-	int res;
-
-	res = unlink(path);
-	if (res == -1)
-		return -errno;
-
-	return 0;
+        return 0;
 }
 
-static int tfs_rmdir(const char *path)
+static int do_write(const char *path, const char * buffer, size_t size, off_t offset, struct fuse_file_info *fi)
 {
-	int res;
 
-	res = rmdir(path);
-	if (res == -1)
-		return -errno;
+        int i,j;
+        offset = 0;
+        printf("\nWrite Operation\n");
+        for(i=0; i<ilen; i++)
+        {
+                char fpath[10];
+                fpath[0] = '/';
+                strcat(fpath,get(i));
+                char* fpath2 = fpath;
+                //printf("\n%s\n",fpath2);
+                if(strcmp(path,fpath2)==0)
+                {
+                        content[i] = strdup(buffer);
+                        size = strlen(buffer);
+                        printf("Trying to write to file\n");
+                        return size;
+                        break;
+                }
+                for(j=0; j<10; j++)
+                {
+                        fpath[j]='\0';
+                }
+        }
+        return size;
 
-	return 0;
 }
 
-static int tfs_symlink(const char *from, const char *to)
+static int do_create(const char * path, mode_t mode,struct fuse_file_info *fi)
 {
-	int res;
-
-	res = symlink(from, to);
-	if (res == -1)
-		return -errno;
-
-	return 0;
+        int i;
+        printf("\nTrying to create file\n");
+        //for(i=0;i<ilen;i++)
+        //{
+        /*
+           if(strcmp(strdup(get(i)),strdup(path)))
+           {
+            printf("\nFile already exists.\n");
+            break;
+           }
+           else
+           {
+         */
+        mode = 0777;
+        insert(strdup(path));
+        return 0;
+        //}
+        //}
 }
 
-static int tfs_rename(const char *from, const char *to, unsigned int flags)
+static int do_access(const char *path, int mask)
 {
-	int res;
-
-	if (flags)
-		return -EINVAL;
-
-	res = rename(from, to);
-	if (res == -1)
-		return -errno;
-
-	return 0;
+        return 0;
 }
 
-static int tfs_link(const char *from, const char *to)
+int do_setxattr(const char * path, size_t size)
 {
-	int res;
-
-	res = link(from, to);
-	if (res == -1)
-		return -errno;
-
-	return 0;
+        size = 1024;
+        return 0;
 }
 
-static int tfs_chmod(const char *path, mode_t mode,
-		     struct fuse_file_info *fi)
-{
-	(void) fi;
-	int res;
+static struct fuse_operations operations = {
 
-	res = chmod(path, mode);
-	if (res == -1)
-		return -errno;
+        .getattr    = do_getattr,
+        .readdir    = do_readdir,
+        .read       = do_read,
+        .truncate   = do_truncate,
+        .write      = do_write,
+        .create     = do_create,
+        //.mkdir		= do_mkdir,
+        //.mknod		= do_create,
+        .access   = do_access,
+        .setxattr = do_setxattr,
 
-	return 0;
-}
-
-static int tfs_chown(const char *path, uid_t uid, gid_t gid,
-		     struct fuse_file_info *fi)
-{
-	(void) fi;
-	int res;
-
-	res = lchown(path, uid, gid);
-	if (res == -1)
-		return -errno;
-
-	return 0;
-}
-
-static int tfs_truncate(const char *path, off_t size,
-			struct fuse_file_info *fi)
-{
-	int res;
-
-	if (fi != NULL)
-		res = ftruncate(fi->fh, size);
-	else
-		res = truncate(path, size);
-	if (res == -1)
-		return -errno;
-
-	return 0;
-}
-
-#ifdef HAVE_UTIMENSAT
-static int tfs_utimens(const char *path, const struct timespec ts[2],
-		       struct fuse_file_info *fi)
-{
-	(void) fi;
-	int res;
-
-	/* don't use utime/utimes since they follow symlinks */
-	res = utimensat(0, path, ts, AT_SYMLINK_NOFOLLOW);
-	if (res == -1)
-		return -errno;
-
-	return 0;
-}
-#endif
-
-static int tfs_create(const char *path, mode_t mode,
-		      struct fuse_file_info *fi)
-{
-	int res;
-
-	res = open(path, fi->flags, mode);
-	if (res == -1)
-		return -errno;
-
-	fi->fh = res;
-	return 0;
-}
-
-static int tfs_open(const char *path, struct fuse_file_info *fi)
-{
-	int res;
-
-	res = open(path, fi->flags);
-	if (res == -1)
-		return -errno;
-
-	fi->fh = res;
-	return 0;
-}
-
-static int tfs_read(const char *path, char *buf, size_t size, off_t offset,
-		    struct fuse_file_info *fi)
-{
-	int fd;
-	int res;
-
-	if(fi == NULL)
-		fd = open(path, O_RDONLY);
-	else
-		fd = fi->fh;
-
-	if (fd == -1)
-		return -errno;
-
-	res = pread(fd, buf, size, offset);
-	if (res == -1)
-		res = -errno;
-
-	if(fi == NULL)
-		close(fd);
-	return res;
-}
-
-static int tfs_write(const char *path, const char *buf, size_t size,
-		     off_t offset, struct fuse_file_info *fi)
-{
-	int fd;
-	int res;
-
-	(void) fi;
-	if(fi == NULL)
-		fd = open(path, O_WRONLY);
-	else
-		fd = fi->fh;
-
-	if (fd == -1)
-		return -errno;
-
-	res = pwrite(fd, buf, size, offset);
-	if (res == -1)
-		res = -errno;
-
-	if(fi == NULL)
-		close(fd);
-	return res;
-}
-
-static int tfs_statfs(const char *path, struct statvfs *stbuf)
-{
-	int res;
-
-	res = statvfs(path, stbuf);
-	if (res == -1)
-		return -errno;
-
-	return 0;
-}
-
-static int tfs_release(const char *path, struct fuse_file_info *fi)
-{
-	(void) path;
-	close(fi->fh);
-	return 0;
-}
-
-static int tfs_fsync(const char *path, int isdatasync,
-		     struct fuse_file_info *fi)
-{
-	/* Just a stub.	 This method is optional and can safely be left
-	   unimplemented */
-
-	(void) path;
-	(void) isdatasync;
-	(void) fi;
-	return 0;
-}
-
-#ifdef HAVE_POSIX_FALLOCATE
-static int tfs_fallocate(const char *path, int mode,
-			off_t offset, off_t length, struct fuse_file_info *fi)
-{
-	int fd;
-	int res;
-
-	(void) fi;
-
-	if (mode)
-		return -EOPNOTSUPP;
-
-	if(fi == NULL)
-		fd = open(path, O_WRONLY);
-	else
-		fd = fi->fh;
-
-	if (fd == -1)
-		return -errno;
-
-	res = -posix_fallocate(fd, offset, length);
-
-	if(fi == NULL)
-		close(fd);
-	return res;
-}
-#endif
-
-#ifdef HAVE_SETXATTR
-/* xattr operations are optional and can safely be left unimplemented */
-static int tfs_setxattr(const char *path, const char *name, const char *value,
-			size_t size, int flags)
-{
-	int res = lsetxattr(path, name, value, size, flags);
-	if (res == -1)
-		return -errno;
-	return 0;
-}
-
-static int tfs_getxattr(const char *path, const char *name, char *value,
-			size_t size)
-{
-	int res = lgetxattr(path, name, value, size);
-	if (res == -1)
-		return -errno;
-	return res;
-}
-
-static int tfs_listxattr(const char *path, char *list, size_t size)
-{
-	int res = llistxattr(path, list, size);
-	if (res == -1)
-		return -errno;
-	return res;
-}
-
-static int tfs_removexattr(const char *path, const char *name)
-{
-	int res = lremovexattr(path, name);
-	if (res == -1)
-		return -errno;
-	return 0;
-}
-#endif /* HAVE_SETXATTR */
-
-static struct fuse_operations tfs_oper = {
-	.init           = tfs_init,
-	.getattr	= tfs_getattr,
-	.access		= tfs_access,
-	.readlink	= tfs_readlink,
-	.readdir	= tfs_readdir,
-	.mknod		= tfs_mknod,
-	.mkdir		= tfs_mkdir,
-	.symlink	= tfs_symlink,
-	.unlink		= tfs_unlink,
-	.rmdir		= tfs_rmdir,
-	.rename		= tfs_rename,
-	.link		= tfs_link,
-	.chmod		= tfs_chmod,
-	.chown		= tfs_chown,
-	.truncate	= tfs_truncate,
-#ifdef HAVE_UTIMENSAT
-	.utimens	= tfs_utimens,
-#endif
-	.open		= tfs_open,
-	.create 	= tfs_create,
-	.read		= tfs_read,
-	.write		= tfs_write,
-	.statfs		= tfs_statfs,
-	.release	= tfs_release,
-	.fsync		= tfs_fsync,
-#ifdef HAVE_POSIX_FALLOCATE
-	.fallocate	= tfs_fallocate,
-#endif
-#ifdef HAVE_SETXATTR
-	.setxattr	= tfs_setxattr,
-	.getxattr	= tfs_getxattr,
-	.listxattr	= tfs_listxattr,
-	.removexattr	= tfs_removexattr,
-#endif
 };
 
-int main(int argc, char *argv[])
+int main( int argc, char *argv[] )
 {
-	umask(0);
-	return fuse_main(argc, argv, &tfs_oper, NULL);
+        insert(".");
+        insert("..");
+        insert("file1");
+        insert("file2");
+        insert("new");
+        iwrite(4,"Hello");
+        iwrite(2,"Heyyy");
+        iwrite(3,"Hi");
+
+
+        return fuse_main( argc, argv, &operations, NULL );
 }
