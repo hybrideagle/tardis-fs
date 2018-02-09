@@ -1,3 +1,6 @@
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 #define BLOCKSIZE 1024 //bytes
 #define NUM_FILES 1000 //number of files
 #define NUM_BLOCKS 1024 //number of blocks
@@ -21,19 +24,24 @@ struct stats {
 };
 
 struct file {
-  char* path;
-  blockno_t start_block;
+        char* path;
+        blockno_t start_block;
+        bool used;
 };
 
 inode_t file_count;
 
-struct file t[NUM_FILES];
+struct file files[NUM_FILES];
 
 inode_t create_file(char* path);
 int delete_file(char* path);
 
+struct block {
+        blockno_t next; /* block number of the next block, -1 if N/A */
+        bool allocated; /* is this block in use? */
+};
 //for each block(as the index of the array), stores the next block's number
-blockno_t next[NUM_BLOCKS];
+struct block blocks[NUM_BLOCKS];
 blockno_t get_first_block_from_path(char* path);
 blockno_t get_first_block_from_inode(inode_t inode);
 blockno_t get_next_block();
@@ -53,6 +61,6 @@ int write_to_path(char* path, char* buffer, int bytes, int offset);
 //sync everything to disk. Not sure if anyone needs this, but it's here anyway
 void sync();
 
-// Initializes the backing store, using the given path.
+// Initializes the backing store, using the given path to the backing store file.
 // Should be called at the beginning of main.
 void init_tfs(char* path);
