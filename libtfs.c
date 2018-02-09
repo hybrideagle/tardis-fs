@@ -76,4 +76,11 @@ int delete_file(char* path){
 }
 
 void init_tfs(char* path){
+        for(inode_t inode = 0;inode<NUM_FILES;inode++){
+                files[inode].used = false;
+        }
+        for(block_t block = 0;block<NUM_BLOCKS;block++){
+                blocks[block].allocated = false;
+                blocks[block].next = -1;                
+        }
 }
