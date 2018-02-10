@@ -59,37 +59,36 @@ block blocks[NUM_BLOCKS];
     Sync should write all of the header to disk, data should be written immediately.
  */
 
-offset_t files_offset = 0;
-offset_t blocks_offset = 0;//sizeof(struct file)*NUM_FILES;
-offset_t data_offset = 0;//sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM_BLOCKS;
+offset_t files_offset;
+offset_t blocks_offset;//sizeof(struct file)*NUM_FILES;
+offset_t data_offset;//sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM_BLOCKS;
 
-
-inode_t create_file(char* path);
-int delete_file(char* path);
+extern inode_t create_file(char* path);
+extern int delete_file(char* path);
 
 //for each block(as the index of the array), stores the next block's number
-blockno_t get_first_block_from_path(char* path);
-blockno_t get_first_block_from_inode(inode_t inode);
-blockno_t get_next_block();
-blockno_t get_first_free_block();
-bool delete_block_chain(blockno_t);
+extern blockno_t get_first_block_from_path(char* path);
+extern blockno_t get_first_block_from_inode(inode_t inode);
+extern blockno_t get_next_block();
+extern blockno_t get_first_free_block();
+extern bool delete_block_chain(blockno_t);
 // void delete_block(blockno_t); //Don't think we'll need this
 
 // basic read and write function with 2 ways of accessing the file.
 // Returns 0 on success, -1 on failure
 // It's your problem if it segfaults because bytes > len(buffer)
-int read_from_block(blockno_t n, char* buffer, int bytes, int offset);
-int read_from_path(char* path, char* buffer, int bytes, int offset);
+extern int read_from_block(blockno_t n, char* buffer, int bytes, int offset);
+extern int read_from_path(char* path, char* buffer, int bytes, int offset);
 
 //auto-skips if offset and/or (offset+bytes) is greater than block size.
-int write_to_block(blockno_t n, char* buffer, int bytes, int offset);
-int write_to_path(char* path, char* buffer, int bytes, int offset);
+extern int write_to_block(blockno_t n, char* buffer, int bytes, int offset);
+extern int write_to_path(char* path, char* buffer, int bytes, int offset);
 
 //sync the headers to disk. Data should auto-sync(passthrough).
-void sync();
+extern void sync();
 
 // Initializes the backing store, using the given path to the backing store file.
 // Should be called at the beginning of main.
-void init_tfs(char* path);
+extern void init_tfs(char* path);
 
 #endif //LIBTFS_H
