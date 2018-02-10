@@ -81,6 +81,20 @@ void init_tfs(char* path){
         }
         for(block_t block = 0;block<NUM_BLOCKS;block++){
                 blocks[block].allocated = false;
-                blocks[block].next = -1;                
+                blocks[block].next = -1;
         }
+        backing_storage_path = strdup(path);
+        backing_storage = fopen(path, "r+b");
+        fseek(backing_storage, 0, 0);
+        fread(files, sizeof(struct files), NUM_FILES, backing_storage);
+        fseek(backing_storage, 0, blocks_offset);
+        fread(blocks, sizeof(struct blocks), NUM_FILES, backing_storage);
+}
+
+void sync(){
+    fseek(backing_storage, 0, 0);
+    fwrite(files, sizeof(struct files), NUM_FILES, backing_storage);
+    fseek(backing_storage, 0, blocks_offset);
+    fwrite(blocks, sizeof(struct blocks), NUM_FILES, backing_storage);
+    fsync();
 }
