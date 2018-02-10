@@ -210,6 +210,7 @@ static struct fuse_operations operations = {
 
 int main( int argc, char *argv[] )
 {
+        init_tfs(argv[1]);
         insert(".");
         insert("..");
         insert("file1");

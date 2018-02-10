@@ -35,10 +35,10 @@ typedef struct block {
 }block;
 
 typedef struct stats {
-    int st_ino;     /* inode number */
-    int st_mode;    /* protection */
-    unsigned int st_uid;   /* user ID of owner */
-    unsigned int st_gid;   /* group ID of owner */
+        int st_ino; /* inode number */
+        int st_mode; /* protection */
+        unsigned int st_uid; /* user ID of owner */
+        unsigned int st_gid; /* group ID of owner */
 //    long st_size; /* total size, in bytes */
 //    long st_atime; /* time of last access */
 //    long st_mtime; /* time of last modification */
