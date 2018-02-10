@@ -92,6 +92,8 @@ void init_tfs(char* path){
 }
 
 void sync(){
+    blocks_offset = sizeof(struct file)*NUM_FILES;
+    data_offset = sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM_BLOCKS;
     fseek(backing_storage, 0, 0);
     fwrite(files, sizeof(struct files), NUM_FILES, backing_storage);
     fseek(backing_storage, 0, blocks_offset);

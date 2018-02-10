@@ -20,16 +20,6 @@ typedef int inode_t;
 //type alias for accessing offset in the backing storage
 typedef int offset_t;
 
-struct stats {
-        int st_ino;     /* inode number */
-        int st_mode;    /* protection */
-        unsigned int st_uid;   /* user ID of owner */
-        unsigned int st_gid;   /* group ID of owner */
-        long st_size; /* total size, in bytes */
-        long st_atime; /* time of last access */
-        long st_mtime; /* time of last modification */
-        long st_ctime; /* time of last status change */
-};
 struct file {
         char* path;
         blockno_t start_block;
@@ -41,6 +31,16 @@ struct block {
         bool allocated; /* is this block in use? */
 };
 
+struct stats {
+    int st_ino;     /* inode number */
+    int st_mode;    /* protection */
+    unsigned int st_uid;   /* user ID of owner */
+    unsigned int st_gid;   /* group ID of owner */
+    long st_size; /* total size, in bytes */
+    long st_atime; /* time of last access */
+    long st_mtime; /* time of last modification */
+    long st_ctime; /* time of last status change */
+};
 
 
 struct file files[NUM_FILES];
@@ -54,11 +54,11 @@ struct block blocks[NUM_BLOCKS];
     3. The actual block data in an array of `BLOCKSIZE` bytes, length NUM_BLOCKS
         [NUM_BLOCKS*BLOCKSIZE bytes]
     Sync should write all of the header to disk, data should be written immediately.
-*/
+ */
 
 offset_t files_offset = 0;
-offset_t blocks_offset = sizeof(struct file)*NUM_FILES;
-offset_t data_offset = sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM_BLOCKS;
+offset_t blocks_offset = 0;//sizeof(struct file)*NUM_FILES;
+offset_t data_offset = 0;//sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM_BLOCKS;
 
 
 inode_t create_file(char* path);
