@@ -1,3 +1,6 @@
+#ifndef LIBTFS_H
+#define LIBTFS_H
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,31 +23,31 @@ typedef int inode_t;
 //type alias for accessing offset in the backing storage
 typedef int offset_t;
 
-struct file {
+typedef struct file {
         char* path;
         blockno_t start_block;
         bool used;
-};
+}file;
 inode_t file_count;
-struct block {
+typedef struct block {
         blockno_t next; /* block number of the next block, -1 if N/A */
         bool allocated; /* is this block in use? */
-};
+}block;
 
-struct stats {
+typedef struct stats {
     int st_ino;     /* inode number */
     int st_mode;    /* protection */
     unsigned int st_uid;   /* user ID of owner */
     unsigned int st_gid;   /* group ID of owner */
-    long st_size; /* total size, in bytes */
-    long st_atime; /* time of last access */
-    long st_mtime; /* time of last modification */
-    long st_ctime; /* time of last status change */
-};
+//    long st_size; /* total size, in bytes */
+//    long st_atime; /* time of last access */
+//    long st_mtime; /* time of last modification */
+//    long st_ctime; /* time of last status change */
+}stats;
 
 
-struct file files[NUM_FILES];
-struct block blocks[NUM_BLOCKS];
+file files[NUM_FILES];
+block blocks[NUM_BLOCKS];
 
 /* Structure of the backing storage:
     The backing storage should contain binary data in the form:
@@ -88,3 +91,5 @@ void sync();
 // Initializes the backing store, using the given path to the backing store file.
 // Should be called at the beginning of main.
 void init_tfs(char* path);
+
+#endif //LIBTFS_H
