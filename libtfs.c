@@ -2,31 +2,99 @@
 #include <string.h>
 #include <unistd.h>
 #include "libtfs.h"
+#include <assert.h>
 
-int read_from_block(blockno_t n, char *buffer, int bytes, int offset)
+FILE *get_data_handle(blockno_t block, offset_t offset)
 {
+    assert(offset < BLOCKSIZE);
+
+    FILE *handle = fopen(backing_storage_path, "rw+b");
+    fseek(handle, (block * BLOCKSIZE) + offset, blocks_origin);
+    return handle;
 }
 
-int read_from_path(char *path, char *buffer, int bytes, int offset)
+/**
+   read `bytes` bytes from the file into `buffer`.
+   `block` points to the beginning of the file
+   returns 1 on failure
+   No bound checking occurs, segfaults are your problem
+ */
+int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
 {
-    return(read_from_block(get_first_block_from_path(path), buffer, bytes, offset));
+    //seek to the correct block
+    while (offset > BLOCKSIZE)
+    {
+        offset -= BLOCKSIZE;
+        block = get_next_block(block);
+        if (-1 == block)
+        {
+            printf("\nFile overread");
+            return -1;
+        }
+    }
+    // start reading data
+    FILE *handle;
+    while (bytes > 0)
+    {
+        handle = get_data_handle(block, offset);
+        offset = 0;
+        for (int i = 0; i < BLOCKSIZE && bytes > 0; i++)
+        {
+            *(buffer++) = fgetc(handle);
+            bytes--;
+        }
+        fclose(handle);
+        block = get_next_block(block);
+    }
+    return 0;
+}
+
+int read_from_path(char *path, offset_t offset, char *buffer, int bytes)
+{
+    return read_from_block(get_first_block_from_path(path), offset, buffer, bytes);
 }
 
 //auto-skips if offset and/or (offset+bytes) is greater than block size.
-int write_to_block(blockno_t n, char *buffer, int bytes, int offset)
+int write_to_block(blockno_t block, offset_t offset, char *buffer, int bytes)
 {
+    //seek to the correct block
+    while (offset > BLOCKSIZE)
+    {
+        offset -= BLOCKSIZE;
+        block = get_next_block(block);
+        if (-1 == block)
+        {
+            printf("\nFile overread");
+            return -1;
+        }
+    }
+    // start writing data
+    FILE *handle;
+    while (bytes > 0)
+    {
+        handle = get_data_handle(block, offset);
+        offset = 0;
+        for (int i = 0; i < BLOCKSIZE && bytes > 0; i++)
+        {
+            fputc(*buffer++, handle);
+            bytes--;
+        }
+        fclose(handle);
+        block = get_next_block(block);
+    }
+    return 0;
 }
 
-int write_to_path(char *path, char *buffer, int bytes, int offset)
+int write_to_path(char *path, offset_t offset, char *buffer, int bytes)
 {
-    return write_to_block(get_first_block_from_path(path), buffer, bytes, offset);
+    return write_to_block(get_first_block_from_path(path), offset, buffer, bytes);
 }
 
 blockno_t get_first_block_from_path(char *path)
 {
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
     {
-        if (strcmp(files[inode].path, path) == 0)
+        if (0 == strcmp(files[inode].path, path))
         {
             return get_first_block_from_inode(inode);
         }
@@ -36,12 +104,12 @@ blockno_t get_first_block_from_path(char *path)
 
 blockno_t get_first_block_from_inode(inode_t inode)
 {
-    return(files[inode].start_block);
+    return files[inode].start_block;
 }
 
 blockno_t get_next_block(blockno_t blockno)
 {
-    return(blocks[blockno].next);
+    return blocks[blockno].next;
 }
 
 blockno_t get_first_free_block()
@@ -50,7 +118,7 @@ blockno_t get_first_free_block()
     {
         if (!blocks[i].allocated)
         {
-            return(i);
+            return i;
         }
     }
     return -1;
@@ -58,8 +126,10 @@ blockno_t get_first_free_block()
 
 bool delete_block_chain(blockno_t start_block)
 {
-    if(start_block == -1)
+    if (start_block == -1)
+    {
         return false;
+    }
     blockno_t curr_block = start_block;
 
     do
@@ -115,22 +185,21 @@ void init_tfs(char *path)
         blocks[block].next = -1;
     }
     backing_storage_path = strdup(path);
-    backing_storage = fopen(path, "r+b");
     fseek(backing_storage, 0, 0);
     fread(files, sizeof(files), NUM_FILES, backing_storage);
-    fseek(backing_storage, 0, blocks_offset);
+    fseek(backing_storage, 0, blocks_origin);
     fread(blocks, sizeof(blocks), NUM_FILES, backing_storage);
     printf("Done");
 }
 
 void sync()
 {
-    files_offset = 0;
-    blocks_offset = sizeof(file) * NUM_FILES;
-    data_offset = sizeof(file) * NUM_FILES + sizeof(blocks) * NUM_BLOCKS;
+    files_origin = 0;
+    blocks_origin = sizeof(file) * NUM_FILES;
+    data_origin = sizeof(file) * NUM_FILES + sizeof(blocks) * NUM_BLOCKS;
     fseek(backing_storage, 0, 0);
     fwrite(files, sizeof(files), NUM_FILES, backing_storage);
-    fseek(backing_storage, 0, blocks_offset);
+    fseek(backing_storage, 0, blocks_origin);
     fwrite(blocks, sizeof(blocks), NUM_FILES, backing_storage);
     fsync(fileno(backing_storage));
 }

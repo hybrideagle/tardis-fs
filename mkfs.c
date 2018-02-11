@@ -21,10 +21,10 @@ void open_backing_storage_file(char* path){
 void write_backing_storage(char* path){
     init_internal_data();
     open_backing_storage_file(path);
-    blocks_offset = sizeof(file)*NUM_FILES;
-    printf("\nUsing block offset:%d",blocks_offset);
-    data_offset = sizeof(file)*NUM_FILES + sizeof(block)*NUM_BLOCKS;
-    printf("\nUsing data offset:%d",data_offset);
+    blocks_origin = sizeof(file)*NUM_FILES;
+    printf("\nUsing block offset:%d",blocks_origin);
+    data_origin = sizeof(file)*NUM_FILES + sizeof(block)*NUM_BLOCKS;
+    printf("\nUsing data offset:%d",data_origin);
     printf("\nUsing BLOCKSIZE:%d",BLOCKSIZE);
     printf("\nUsing NUM_FILES:%d",NUM_FILES);
     printf("\nUsing NUM_BLOCKS:%d",NUM_BLOCKS);
@@ -32,14 +32,13 @@ void write_backing_storage(char* path){
     fseek(backing_storage, 0, 0);
     fwrite(files, sizeof(files), NUM_FILES, backing_storage);
     printf("\nFinished writing file list");
-    fseek(backing_storage, 0, blocks_offset);
+    fseek(backing_storage, 0, blocks_origin);
     printf("\nFinished writing block list");
     fwrite(blocks, sizeof(blocks), NUM_FILES, backing_storage);
     printf("\nFinished writing block list");
 
     //sync();
-    char b = 0;
-    fseek(backing_storage, 0, data_offset);
+    fseek(backing_storage, 0, data_origin);
     for(blockno_t record = 0; record < NUM_BLOCKS; record++){
         for(offset_t offset = 0; offset < BLOCKSIZE; offset++){
             fputc((record+offset)%255, backing_storage);

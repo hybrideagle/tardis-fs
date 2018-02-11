@@ -209,9 +209,18 @@ static struct fuse_operations operations = {
 
 };
 
+void print_usage(){
+    printf("Usage: mount.tfs [mount/path] [backing/storage/path]");
+}
+
 int main( int argc, char *argv[] )
 {
-        init_tfs(argv[1]);
+        /*Yes, this is terrible code, I really should be using Argp. Sue me.*/
+        if(argc != 3){
+            print_usage();
+            return -1;
+        }
+        init_tfs(argv[2]);
         insert(".");
         insert("..");
         insert("file1");
@@ -221,6 +230,5 @@ int main( int argc, char *argv[] )
         iwrite(2,"Heyyy");
         iwrite(3,"Hi");
 
-
-        return fuse_main( argc, argv, &operations, NULL );
+        return fuse_main( (argc-1), argv, &operations, NULL );
 }

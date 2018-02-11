@@ -1,6 +1,6 @@
 #ifndef LIBTFS_H
 #define LIBTFS_H
-
+#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,20 +8,20 @@
 #define NUM_FILES 1000 //number of files
 #define NUM_BLOCKS 1024 //number of blocks
 
+#ifndef assert
+    #define assert(x) if(!(x)) {printf("\nassertion failed:%s",#x); exit(1);}
+#endif
+
 // Global, holds the full path to the backing storage file
 char* backing_storage_path;
 
-// Global, holds a file pointer to the backing storage
 FILE* backing_storage;
-
 // Type alias for referencing offset within a block
 typedef int offset_t;
 // Type alias for referncing block numbers
 typedef int blockno_t;
 // type alias for referencing file record offset
 typedef int inode_t;
-//type alias for accessing offset in the backing storage
-typedef int offset_t;
 
 typedef struct file {
         char* path;
@@ -59,9 +59,9 @@ block blocks[NUM_BLOCKS];
     Sync should write all of the header to disk, data should be written immediately.
  */
 
-offset_t files_offset;
-offset_t blocks_offset;//sizeof(struct file)*NUM_FILES;
-offset_t data_offset;//sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM_BLOCKS;
+offset_t files_origin;
+offset_t blocks_origin;//sizeof(struct file)*NUM_FILES;
+offset_t data_origin;//sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM_BLOCKS;
 
 extern inode_t create_file(char* path);
 extern int delete_file(char* path);
@@ -77,12 +77,12 @@ extern bool delete_block_chain(blockno_t);
 // basic read and write function with 2 ways of accessing the file.
 // Returns 0 on success, -1 on failure
 // It's your problem if it segfaults because bytes > len(buffer)
-extern int read_from_block(blockno_t n, char* buffer, int bytes, int offset);
-extern int read_from_path(char* path, char* buffer, int bytes, int offset);
+extern int read_from_block(blockno_t n, offset_t offset, char *buffer, int bytes);
+extern int read_from_path(char* path, offset_t offset, char *buffer, int bytes);
 
 //auto-skips if offset and/or (offset+bytes) is greater than block size.
-extern int write_to_block(blockno_t n, char* buffer, int bytes, int offset);
-extern int write_to_path(char* path, char* buffer, int bytes, int offset);
+extern int write_to_block(blockno_t n, offset_t offset, char *buffer, int bytes);
+extern int write_to_path(char* path, offset_t offset, char *buffer, int bytes);
 
 //sync the headers to disk. Data should auto-sync(passthrough).
 extern void sync();
