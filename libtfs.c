@@ -4,6 +4,10 @@
 #include "libtfs.h"
 #include <assert.h>
 
+//TODO add file size calculation
+//TODO add directories
+
+//TODO rename this
 FILE *get_data_handle(blockno_t block, offset_t offset)
 {
     assert(offset < BLOCKSIZE);
@@ -80,7 +84,7 @@ int write_to_block(blockno_t block, offset_t offset, char *buffer, int bytes)
             bytes--;
         }
         fclose(handle);
-        block = get_next_block(block);
+        block = get_or_create_next_block(block);
     }
     return 0;
 }
@@ -109,6 +113,17 @@ blockno_t get_first_block_from_inode(inode_t inode)
 
 blockno_t get_next_block(blockno_t blockno)
 {
+    return blocks[blockno].next;
+}
+
+blockno_t get_or_create_next_block(blockno_t blockno)
+{
+    if(blocks[blockno].next == -1)
+    {
+        //TODO finish this
+        for()
+    }
+
     return blocks[blockno].next;
 }
 
