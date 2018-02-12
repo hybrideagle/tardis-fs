@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define BLOCKSIZE 1024 //bytes
-#define NUM_FILES 1000 //number of files
-#define NUM_BLOCKS 1024 //number of blocks
+#define NUM_FILES 10 //number of files(inodes)
+#define NUM_BLOCKS 30 //number of blocks
 
 #ifndef assert
     #define assert(x) if(!(x)) {printf("\nassertion failed:%s",#x); exit(1);}
