@@ -11,6 +11,9 @@ void init_internal_data(){
             blocks[block].allocated = false;
             blocks[block].next = -1;
     }
+    blocks_origin = sizeof(file)*NUM_FILES;
+    data_origin = sizeof(file)*NUM_FILES + sizeof(block)*NUM_BLOCKS;
+
 }
 
 void open_backing_storage_file(char* path){
@@ -21,9 +24,7 @@ void open_backing_storage_file(char* path){
 void write_backing_storage(char* path){
     init_internal_data();
     open_backing_storage_file(path);
-    blocks_origin = sizeof(file)*NUM_FILES;
     printf("\nUsing block offset:%d",blocks_origin);
-    data_origin = sizeof(file)*NUM_FILES + sizeof(block)*NUM_BLOCKS;
     printf("\nUsing data offset:%d",data_origin);
     printf("\nUsing BLOCKSIZE:%d",BLOCKSIZE);
     printf("\nUsing NUM_FILES:%d",NUM_FILES);
