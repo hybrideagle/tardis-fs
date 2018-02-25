@@ -63,6 +63,8 @@ offset_t files_origin;
 offset_t blocks_origin;//sizeof(struct file)*NUM_FILES;
 offset_t data_origin;//sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM_BLOCKS;
 
+
+
 extern inode_t create_file(char* path);
 extern int delete_file(char* path);
 
@@ -83,6 +85,8 @@ extern int read_from_path(char* path, offset_t offset, char *buffer, int bytes);
 //auto-skips if offset and/or (offset+bytes) is greater than block size.
 extern int write_to_block(blockno_t n, offset_t offset, char *buffer, int bytes);
 extern int write_to_path(char* path, offset_t offset, char *buffer, int bytes);
+
+extern int block_chain_length(blockno_t start_block);
 
 //sync the headers to disk. Data should auto-sync(passthrough).
 extern void sync();

@@ -227,3 +227,13 @@ void sync()
     fwrite(blocks, sizeof(blocks), NUM_FILES, backing_storage);
     fsync(fileno(backing_storage));
 }
+
+
+int block_chain_length(blockno_t start_block)
+{
+    int size = 0;
+    do {
+        size += BLOCKSIZE;
+        start_block = blocks[start_block].next;
+    } while(start_block != -1);
+}

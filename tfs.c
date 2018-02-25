@@ -18,24 +18,30 @@ int ilen = 0;
 
 void insert(char* path)
 {
-        name[ilen] = strdup(path);
-        ilen++;
+        //name[ilen] = strdup(path);
+        //ilen++;
+        create_file(path);
 }
 
 
-const char* get(int inode)
+const char* get_path(inode_t inode)
 {
-        return name[inode];
+        //return name[inode];
+        return files[inode].name;
 }
 
 const char* iread(int inode)
 {
-        return content[inode];
+        //return content[inode];
+        char* buf = (char*)malloc(sizeof(char)*1000);
+        read_from_block(files[inode].start_block, 0, buf, 1000);
+
+        return buf;
 }
 
 void iwrite(int inode,char* text)
 {
-        content[inode] = strdup(text);
+        write_to_block(files[inode].start_block, 0, text, strlen(text));
 }
 
 int getinode(char* path)
@@ -45,7 +51,7 @@ int getinode(char* path)
         {
                 char fpath[10];
                 fpath[0] = '/';
-                strcat(fpath,get(i));
+                strcat(fpath,get_path(i));
                 char* fpath2 = fpath;
                 if(strcmp(path,fpath2)==0 && strlen(path)==strlen(fpath2))
                 {
@@ -154,7 +160,7 @@ static int do_getattr( const char *path, struct stat *st )
         {
                 char fpath[10];
                 fpath[0] = '/';
-                strcat(fpath,get(i));
+                strcat(fpath,get_path(i));
                 char* fpath2 = fpath;
                 if(strcmp(path,fpath2)==0)
                 {
@@ -178,10 +184,10 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
         for(i = 0; i<ilen; i++)
         {
                 root = 0, count = 0;
-                for(j=0; j<strlen(get(i)); j++)
+                for(j=0; j<strlen(get_path(i)); j++)
                 {
-                        printf("Testing : %d\t%c|\n",get(i)[j]-'/',get(i)[j]);
-                        if(get(i)[j]=='/')
+                        printf("Testing : %d\t%c|\n",get_path(i)[j]-'/',get_path(i)[j]);
+                        if(get_path(i)[j]=='/')
                         {
                                 count++;
                         }
@@ -194,14 +200,14 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
                 count = 0;
                 for(j=0; j<strlen(path)-1; j++)
                 {
-                        if(path[j+1]-get(i)[j]!=0)
+                        if(path[j+1]-get_path(i)[j]!=0)
                         {
                                 count++;
                         }
                 }
                 if(count==0)
                 {
-                        if(strlen(get(i))<strlen(path))
+                        if(strlen(get_path(i))<strlen(path))
                         {
                                 count+=100;
                         }
@@ -215,14 +221,14 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
                         }
                 }
                 printf("%s - %d\n",path,c1);
-                for(j=0; j<strlen(get(i)); j++)
+                for(j=0; j<strlen(get_path(i)); j++)
                 {
-                        if(get(i)[j]-'/'==0)
+                        if(get_path(i)[j]-'/'==0)
                         {
                                 c2++;
                         }
                 }
-                if(get(i)[strlen(get(i))-1]-'/'!=0)
+                if(get_path(i)[strlen(get_path(i))-1]-'/'!=0)
                 {
                         c2++;
                 }
@@ -230,7 +236,7 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
                 {
                         c1--;
                 }
-                printf("%s - %d\n",get(i), c2);
+                printf("%s - %d\n",get_path(i), c2);
                 if(c2-c1>1)
                 {
                         count+=1000;
@@ -243,24 +249,24 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
                 printf("\nMismatch = %d\n_____________________\n",count);
                 if(((strcmp(path,"/")==0 && root)||count ==0)&&(count<100000))
                 {
-                        for(j=strlen(get(i))-1; j>=0; j--)
+                        for(j=strlen(get_path(i))-1; j>=0; j--)
                         {
-                                if(get(i)[j]-'/' == 0)
+                                if(get_path(i)[j]-'/' == 0)
                                 {
                                         break;
                                 }
                         }
-                        printf("Show > %s , %d\n",get(i),j);
+                        printf("Show > %s , %d\n",get_path(i),j);
 
                         int s = j;
                         char temp;
                         if(s>0)
                         {
-                                char temp[strlen(get(i))-j];
-                                for(j=0; j<strlen(get(i))-j-1; j++)
+                                char temp[strlen(get_path(i))-j];
+                                for(j=0; j<strlen(get_path(i))-j-1; j++)
                                 {
-                                        printf("Buffering %c\n",strdup(get(j))[j+s+1]);
-                                        temp[j] = strdup(get(i))[j+s+1];
+                                        printf("Buffering %c\n",strdup(get_path(j))[j+s+1]);
+                                        temp[j] = strdup(get_path(i))[j+s+1];
                                 }
                                 temp[j]='\0';
                                 printf("Individual entry : %s\n\n",temp);
@@ -268,13 +274,13 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
                         }
                         else
                         {
-                                printf("%s\n\n",get(i));
-                                filler( buffer, strdup(get(i)), NULL, 0 );
+                                printf("%s\n\n",get_path(i));
+                                filler( buffer, strdup(get_path(i)), NULL, 0 );
                         }
                 }/*
                     if(strlen(path)==1 && root)
                     {
-                        filler( buffer, get(i), NULL, 0 );
+                        filler( buffer, get_path(i), NULL, 0 );
                     }*/
         }
         printf("RETURN 0\n");
@@ -292,7 +298,7 @@ static int do_read( const char *path, char *buffer, size_t size, off_t offset, s
         {
                 char fpath[10];
                 fpath[0] = '/';
-                strcat(fpath,get(i));
+                strcat(fpath,get_path(i));
                 char* fpath2 = fpath;
                 if(strcmp(path,fpath2)==0)
                 {
@@ -332,7 +338,7 @@ static int do_write(const char *path, const char * buffer, size_t size, off_t of
         {
                 char fpath[10];
                 fpath[0] = '/';
-                strcat(fpath,get(i));
+                strcat(fpath,get_path(i));
                 char* fpath2 = fpath;
                 if(strcmp(path,fpath2)==0)
                 {
@@ -366,7 +372,7 @@ static int do_create(const char * path, mode_t mode,struct fuse_file_info *fi)
         for(i=0; i<ilen; i++)
         {
 
-                if(strcmp(strdup(get(i)),strdup(path2))==0)
+                if(strcmp(strdup(get_path(i)),strdup(path2))==0)
                 {
                         printf("\nFile already exists.\n");
                         break;
