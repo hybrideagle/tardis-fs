@@ -52,3 +52,6 @@ Mkfile.old
 dkms.conf
 
 build/
+
+# ctags generated file
+.tags
