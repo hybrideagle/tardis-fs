@@ -290,7 +290,7 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
 
 static int do_read( const char *path, char *buffer, size_t size, off_t offset, struct fuse_file_info *fi )
 {
-        int i,j;
+        /*int i,j;
         printf( "--> Trying to read %s, %lu, %lu\n", path, offset, size );
         char *selectedText = NULL;
 
@@ -319,7 +319,8 @@ static int do_read( const char *path, char *buffer, size_t size, off_t offset, s
                 return -1;
         }
         memcpy( buffer, selectedText + offset, size );
-        return strlen( selectedText ) - offset;
+        return strlen( selectedText ) - offset;*/
+        return read_from_path(path, offset, buffer, size);
 }
 
 const int do_truncate(const char *path, off_t offset, struct fuse_file_info *fi)
