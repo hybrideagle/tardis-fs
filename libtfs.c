@@ -118,10 +118,19 @@ blockno_t get_next_block(blockno_t blockno)
 
 blockno_t get_or_create_next_block(blockno_t blockno)
 {
+    // If next isn't allocated, allocate it
     if(blocks[blockno].next == -1)
     {
         //TODO finish this
-        for()
+        for(blockno_t next = 0; next < NUM_BLOCKS; next++)
+        {
+            if(blocks[next].allocated == false)
+            {
+                blocks[blockno].next = next;
+                assert blocks[next].next == -1;
+                blocks[next].allocated = true;
+            }
+        }
     }
 
     return blocks[blockno].next;
