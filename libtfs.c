@@ -127,7 +127,7 @@ blockno_t get_or_create_next_block(blockno_t blockno)
             if(blocks[next].allocated == false)
             {
                 blocks[blockno].next = next;
-                assert blocks[next].next == -1;
+                assert(blocks[next].next == -1);
                 blocks[next].allocated = true;
             }
         }

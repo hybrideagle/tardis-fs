@@ -9,6 +9,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <assert.h>
+
+#include "libtfs.h"
+
+
 
 const char* name[100];
 const char* content[100];
@@ -27,7 +32,7 @@ void insert(char* path)
 const char* get_path(inode_t inode)
 {
         //return name[inode];
-        return files[inode].name;
+        return files[inode].path;
 }
 
 const char* iread(int inode)
