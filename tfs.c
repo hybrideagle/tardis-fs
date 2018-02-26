@@ -53,6 +53,7 @@ void iwrite(int inode,char* text)
         write_to_block(files[inode].start_block, 0, text, strlen(text));
 }
 
+//TODO verify this works
 int getinode(char* path)
 {
         int i, j;
