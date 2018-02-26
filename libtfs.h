@@ -7,6 +7,7 @@
 #define BLOCKSIZE 1024 //bytes
 #define NUM_FILES 10 //number of files(inodes)
 #define NUM_BLOCKS 30 //number of blocks
+#define PATH_LENGTH 10 //number of characters in each path
 
 #ifndef assert
     #define assert(x) if(!(x)) {printf("\nassertion failed:%s",#x); exit(1);}
@@ -36,10 +37,11 @@ typedef struct stats {
 }stats;
 
 typedef struct file {
-        char* path;
+        char path[PATH_LENGTH];
         blockno_t start_block;
+        bool is_dir;
         bool used;
-        stats stat;
+//        stats stat;
 }file;
 
 // Current max inode
