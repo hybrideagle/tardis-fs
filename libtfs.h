@@ -23,16 +23,6 @@ typedef int blockno_t;
 // type alias for referencing file record offset
 typedef int inode_t;
 
-typedef struct file {
-        char* path;
-        blockno_t start_block;
-        bool used;
-}file;
-inode_t file_count;
-typedef struct block {
-        blockno_t next; /* block number of the next block, -1 if N/A */
-        bool allocated; /* is this block in use? */
-}block;
 
 typedef struct stats {
         int st_ino; /* inode number */
@@ -44,6 +34,21 @@ typedef struct stats {
 //    long st_mtime; /* time of last modification */
 //    long st_ctime; /* time of last status change */
 }stats;
+
+typedef struct file {
+        char* path;
+        blockno_t start_block;
+        bool used;
+        stats stat;
+}file;
+
+// Current max inode
+inode_t file_count;
+
+typedef struct block {
+        blockno_t next; /* block number of the next block, -1 if N/A */
+        bool allocated; /* is this block in use? */
+}block;
 
 
 file files[NUM_FILES];
@@ -68,7 +73,7 @@ offset_t data_origin;//sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM
 extern inode_t create_file(char* path);
 extern int delete_file(char* path);
 
-//for each block(as the index of the array), stores the next block's number
+// for each block(as the index of the array), stores the next block's number
 extern blockno_t get_first_block_from_path(char* path);
 extern blockno_t get_first_block_from_inode(inode_t inode);
 extern blockno_t get_next_block();
