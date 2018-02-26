@@ -58,7 +58,7 @@ int getinode(char* path)
         int i, j;
         for(i=0; i<file_count; i++)
         {
-                char fpath[10];
+                char fpath[PATH_LENGTH];
                 fpath[0] = '/';
                 strcat(fpath,get_path(i));
                 char* fpath2 = fpath;
@@ -66,6 +66,7 @@ int getinode(char* path)
                 {
                         return i;
                 }
+                // reset for the next run
                 for(j=0; j<10; j++)
                 {
                         fpath[j]='\0';
@@ -76,17 +77,17 @@ int getinode(char* path)
 
 int isd(int inode)
 {
-        if(dir[inode]==1)
+        if(files[inode].used == false)
         {
-                return 0;
+                return -1;
         }
-        else if(dir[inode]==2)
+        else if(files[inode].is_dir == true)
         {
                 return 1;
         }
         else
         {
-                return -1;
+                return 0;
         }
 }
 
@@ -167,7 +168,7 @@ static int do_getattr( const char *path, struct stat *st )
         int i = 0,j = 0;
         for(i=0; i<file_count; i++)
         {
-                char fpath[10];
+                char fpath[PATH_LENGTH];
                 fpath[0] = '/';
                 strcat(fpath,get_path(i));
                 char* fpath2 = fpath;
@@ -305,7 +306,7 @@ static int do_read( const char *path, char *buffer, size_t size, off_t offset, s
 
         for(i=0; i<file_count; i++)
         {
-                char fpath[10];
+                char fpath[PATH_LENGTH];
                 fpath[0] = '/';
                 strcat(fpath,get_path(i));
                 char* fpath2 = fpath;
@@ -346,7 +347,7 @@ static int do_write(const char *path, const char * buffer, size_t size, off_t of
         printf("\nWrite Operation\n");
         for(i=0; i<file_count; i++)
         {
-                char fpath[10];
+                char fpath[PATH_LENGTH];
                 fpath[0] = '/';
                 strcat(fpath,get_path(i));
                 char* fpath2 = fpath;
@@ -373,7 +374,7 @@ static int do_write(const char *path, const char * buffer, size_t size, off_t of
 static int do_create(const char * path, mode_t mode,struct fuse_file_info *fi)
 {
         int i;
-        char path2[10];
+        char path2[PATH_LENGTH];
         for(i=0; i<strlen(path)-1; i++)
         {
                 path2[i] = path[i+1];
@@ -418,7 +419,7 @@ static int do_mkdir(const char * path, mode_t mode)
         printf("Mkdir Called\n");
         dir[file_count] = 2;
         int i;
-        char path2[10];
+        char path2[PATH_LENGTH];
         for(i=0; i<strlen(path)-1; i++)
         {
                 path2[i] = path[i+1];
@@ -433,7 +434,7 @@ static int do_mkdir(const char * path, mode_t mode)
         cp = strdup(path2);
         strcat(cp,"/..");
         dir[file_count] = 2;
-        insert(cp);
+        insert(cp, 1);
         return 0;
 }
 static int do_unlink(const char* path)
