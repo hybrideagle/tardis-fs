@@ -83,6 +83,7 @@ extern int delete_dir(char* path);
 extern blockno_t get_first_block_from_path(char* path);
 extern blockno_t get_first_block_from_inode(inode_t inode);
 extern blockno_t get_next_block();
+extern blockno_t get_or_create_next_block(blockno_t blockno);
 extern blockno_t get_first_free_block();
 extern bool delete_block_chain(blockno_t);
 // void delete_block(blockno_t); //Don't think we'll need this
