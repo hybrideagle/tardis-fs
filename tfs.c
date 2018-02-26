@@ -23,7 +23,7 @@ int file_count = 0;
 
 void insert(char* path, int mode)
 {
-        assert(mode==1 || mode==2)
+        assert(mode==1 || mode==2);
         //name[file_count] = strdup(path);
         //file_count++;
         if(mode == 0)
@@ -392,7 +392,7 @@ static int do_create(const char * path, mode_t mode,struct fuse_file_info *fi)
                 else
                 {
 //                        dir[file_count] = 1;
-                        insert(strdup(path2));
+                        insert(strdup(path2), 0);
                         printf("Insert Command Executed\n");
 
                         printf("RETURN 0\n");
@@ -425,16 +425,16 @@ static int do_mkdir(const char * path, mode_t mode)
                 path2[i] = path[i+1];
         }
         path2[i] = '\0';
-        insert(strdup(path2));
+        insert(strdup(path2), 1);
         char * cp;
         cp = strdup(path2);
         strcat(cp,"/.");
-        dir[file_count] = 2;
-        insert(cp);
+        //dir[file_count] = 2;
+        insert(cp, 0);
         cp = strdup(path2);
         strcat(cp,"/..");
         dir[file_count] = 2;
-        insert(cp, 1);
+        insert(cp, 0);
         return 0;
 }
 static int do_unlink(const char* path)
