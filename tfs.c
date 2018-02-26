@@ -336,7 +336,7 @@ const int do_truncate(const char *path, off_t offset, struct fuse_file_info *fi)
 
 static int do_write(const char *path, const char * buffer, size_t size, off_t offset, struct fuse_file_info *fi)
 {
-
+/*
         int i,j;
         offset = 0;
         printf("\nWrite Operation\n");
@@ -362,7 +362,8 @@ static int do_write(const char *path, const char * buffer, size_t size, off_t of
                 }
         }
         return size;
-
+*/
+    return write_to_path(path, offset, buffer, size);
 }
 
 static int do_create(const char * path, mode_t mode,struct fuse_file_info *fi)
@@ -397,14 +398,14 @@ static int do_create(const char * path, mode_t mode,struct fuse_file_info *fi)
 
 static int do_access(const char *path, int mask)
 {
-        printf("RETURN 0\n");
+        printf("do_access passthrough\n");
         return 0;
 }
 
 static int do_setxattr (const char * path, size_t size)
 {
         size = 1024;
-        printf("RETURN 0\n");
+        printf("do_setattr passthrough\n");
         return 0;
 }
 static int do_mkdir(const char * path, mode_t mode)
