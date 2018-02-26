@@ -173,6 +173,7 @@ inode_t create_file(char *path)
         if (!files[inode].used)
         {
             files[inode].used = true;
+            files[inode].is_dir = true;
             files[inode].path = path;
             files[inode].start_block = get_first_free_block();
             return inode;
@@ -195,6 +196,30 @@ int delete_file(char *path)
     }
     return false;
 }
+
+
+inode_t create_dir(char *path)
+{
+    for (inode_t inode = 0; inode < NUM_FILES; inode++)
+    {
+        if (!files[inode].used)
+        {
+            files[inode].used = true;
+            files[inode].is_dir = true;
+            files[inode].path = path;
+            files[inode].start_block = get_first_free_block();
+            return inode;
+        }
+    }
+    return -1;
+}
+
+int delete_dir(char *path)
+{
+    // TODO check for subfiles and shit
+    delete_file(path);
+}
+
 
 void init_tfs(char *path)
 {
