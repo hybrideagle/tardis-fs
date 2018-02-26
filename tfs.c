@@ -464,17 +464,30 @@ static struct fuse_operations operations = {
 
 int main( int argc, char *argv[] )
 {
+        assert(argc>=2);
+
+        init_tfs(argv[1]);
+
+        //remove the second argument
+        char* x[argc];
+        x[0] = argv[0];
+        for(int i = 2;i<argc;i++)
+            x[i] = argv[i];
+        argc = argc - 2;
+        argv = x;
+
+
         int di;
         for(di=0; di<100; di++)
         {
                 dir[di] = -1;
         }
 
-        insert(".");
-        insert("..");
-        insert("file1");
-        insert("file2");
-        insert("new");
+        insert(".", 0);
+        insert("..", 0);
+        insert("file1", 0);
+        insert("file2", 0);
+        insert("new", 0);
         iwrite(2,"Heyyy");
         iwrite(3,"Hi");
         dir[0]=1; dir[1]=1; dir[2]=1; dir[3]=1; dir[4]=1;
