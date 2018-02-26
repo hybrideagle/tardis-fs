@@ -24,6 +24,8 @@ void open_backing_storage_file(char* path){
 void write_backing_storage(char* path){
     init_internal_data();
     open_backing_storage_file(path);
+    printf("\n[INFO]sizeof(block):%d",sizeof(block));
+    printf("\n[INFO]sizeof(file):%d",sizeof(file));
     printf("\nUsing block offset:%d",blocks_origin);
     printf("\nUsing data offset:%d",data_origin);
     printf("\nUsing BLOCKSIZE:%d",BLOCKSIZE);
