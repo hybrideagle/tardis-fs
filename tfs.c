@@ -19,12 +19,12 @@ const char* name[100];
 const char* content[100];
 int dir[100];
 
-int ilen = 0;
+int file_count = 0;
 
 void insert(char* path)
 {
-        //name[ilen] = strdup(path);
-        //ilen++;
+        //name[file_count] = strdup(path);
+        //file_count++;
         create_file(path);
 }
 
@@ -52,7 +52,7 @@ void iwrite(int inode,char* text)
 int getinode(char* path)
 {
         int i, j;
-        for(i=0; i<ilen; i++)
+        for(i=0; i<file_count; i++)
         {
                 char fpath[10];
                 fpath[0] = '/';
@@ -110,7 +110,7 @@ int rmv(char* path)
 void display()
 {
         int i;
-        for(i=0; i<ilen+1; i++)
+        for(i=0; i<file_count+1; i++)
         {
                 printf("\n%s",name[i]);
         }
@@ -161,7 +161,7 @@ static int do_getattr( const char *path, struct stat *st )
                 return -ENOENT;
         }
         int i = 0,j = 0;
-        for(i=0; i<ilen; i++)
+        for(i=0; i<file_count; i++)
         {
                 char fpath[10];
                 fpath[0] = '/';
@@ -186,7 +186,7 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
         int i,j,count,root=0;
         printf( "--> Getting The List of Files of %s\n", path );
         display();
-        for(i = 0; i<ilen; i++)
+        for(i = 0; i<file_count; i++)
         {
                 root = 0, count = 0;
                 for(j=0; j<strlen(get_path(i)); j++)
@@ -299,7 +299,7 @@ static int do_read( const char *path, char *buffer, size_t size, off_t offset, s
         printf( "--> Trying to read %s, %lu, %lu\n", path, offset, size );
         char *selectedText = NULL;
 
-        for(i=0; i<ilen; i++)
+        for(i=0; i<file_count; i++)
         {
                 char fpath[10];
                 fpath[0] = '/';
@@ -340,7 +340,7 @@ static int do_write(const char *path, const char * buffer, size_t size, off_t of
         int i,j;
         offset = 0;
         printf("\nWrite Operation\n");
-        for(i=0; i<ilen; i++)
+        for(i=0; i<file_count; i++)
         {
                 char fpath[10];
                 fpath[0] = '/';
@@ -376,7 +376,7 @@ static int do_create(const char * path, mode_t mode,struct fuse_file_info *fi)
         }
         path2[i] = '\0';
         printf("\nTrying to create file %s\n",path2);
-        for(i=0; i<ilen; i++)
+        for(i=0; i<file_count; i++)
         {
 
                 if(strcmp(strdup(get_path(i)),strdup(path2))==0)
@@ -386,7 +386,7 @@ static int do_create(const char * path, mode_t mode,struct fuse_file_info *fi)
                 }
                 else
                 {
-                        dir[ilen] = 1;
+                        dir[file_count] = 1;
                         insert(strdup(path2));
                         printf("Insert Command Executed\n");
 
@@ -412,7 +412,7 @@ static int do_mkdir(const char * path, mode_t mode)
 {
         mode = O_CREAT;
         printf("Mkdir Called\n");
-        dir[ilen] = 2;
+        dir[file_count] = 2;
         int i;
         char path2[10];
         for(i=0; i<strlen(path)-1; i++)
@@ -424,11 +424,11 @@ static int do_mkdir(const char * path, mode_t mode)
         char * cp;
         cp = strdup(path2);
         strcat(cp,"/.");
-        dir[ilen] = 2;
+        dir[file_count] = 2;
         insert(cp);
         cp = strdup(path2);
         strcat(cp,"/..");
-        dir[ilen] = 2;
+        dir[file_count] = 2;
         insert(cp);
         return 0;
 }
