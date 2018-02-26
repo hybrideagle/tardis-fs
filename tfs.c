@@ -116,7 +116,7 @@ void display()
         int i;
         for(i=0; i<file_count+1; i++)
         {
-                printf("\n%s",name[i]);
+                printf("\n%s",files[i].path);
         }
 }
 
@@ -390,7 +390,7 @@ static int do_create(const char * path, mode_t mode,struct fuse_file_info *fi)
                 }
                 else
                 {
-                        dir[file_count] = 1;
+//                        dir[file_count] = 1;
                         insert(strdup(path2));
                         printf("Insert Command Executed\n");
 
