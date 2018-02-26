@@ -207,6 +207,7 @@ inode_t create_dir(char *path)
             files[inode].used = true;
             files[inode].is_dir = true;
             files[inode].path = path;
+            strcpy(files[inode].path, path);
             files[inode].start_block = get_first_free_block();
             return inode;
         }
