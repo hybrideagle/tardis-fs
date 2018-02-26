@@ -21,11 +21,15 @@ int dir[100];
 
 int file_count = 0;
 
-void insert(char* path)
+void insert(char* path, int mode)
 {
+        assert(mode==1 || mode==2)
         //name[file_count] = strdup(path);
         //file_count++;
-        create_file(path);
+        if(mode == 0)
+            create_file(path);
+        else if(mode == 1)
+            create_dir(path);
 }
 
 
