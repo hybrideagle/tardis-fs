@@ -174,7 +174,8 @@ inode_t create_file(char *path)
         {
             files[inode].used = true;
             files[inode].is_dir = true;
-            files[inode].path = path;
+            //files[inode].path = path
+            strcpy(files[inode].path, path);
             files[inode].start_block = get_first_free_block();
             return inode;
         }
@@ -206,7 +207,7 @@ inode_t create_dir(char *path)
         {
             files[inode].used = true;
             files[inode].is_dir = true;
-            files[inode].path = path;
+            //files[inode].path = path
             strcpy(files[inode].path, path);
             files[inode].start_block = get_first_free_block();
             return inode;
@@ -218,7 +219,7 @@ inode_t create_dir(char *path)
 int delete_dir(char *path)
 {
     // TODO check for subfiles and shit
-    delete_file(path);
+    return delete_file(path);
 }
 
 
@@ -254,7 +255,7 @@ void sync()
     fsync(fileno(backing_storage));
 }
 
-
+//TODO make this function respect half-filled blocks
 int block_chain_length(blockno_t start_block)
 {
     int size = 0;
@@ -262,4 +263,5 @@ int block_chain_length(blockno_t start_block)
         size += BLOCKSIZE;
         start_block = blocks[start_block].next;
     } while(start_block != -1);
+    return size;
 }
