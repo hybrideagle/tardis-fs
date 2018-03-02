@@ -29,6 +29,12 @@ FILE *get_data_handle(blockno_t block, offset_t offset)
 int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
 {
     START("read_from_block");
+
+    assert(block > 0 && block < NUM_BLOCKS);
+    assert(offset > 0);
+    assert(buffer != NULL);
+    assert(bytes >= 0);
+
     //seek to the correct block
     while (offset > BLOCKSIZE)
     {
@@ -61,6 +67,11 @@ int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
 
 int read_from_path(char *path, offset_t offset, char *buffer, int bytes)
 {
+    assert(path = NULL);
+    assert(offset > 0);
+    assert(buffer != NULL);
+    assert(bytes >= 0);
+
     START("read_from_path");
     return read_from_block(get_first_block_from_path(path), offset, buffer, bytes);
 
@@ -71,6 +82,12 @@ int read_from_path(char *path, offset_t offset, char *buffer, int bytes)
 int write_to_block(blockno_t block, offset_t offset, char *buffer, int bytes)
 {
     START("write_to_block");
+
+    assert(block > 0 && block < NUM_BLOCKS);
+    assert(offset > 0);
+    assert(buffer != NULL);
+    assert(bytes >= 0);
+
     //seek to the correct block
     while (offset > BLOCKSIZE)
     {
@@ -104,6 +121,12 @@ int write_to_block(blockno_t block, offset_t offset, char *buffer, int bytes)
 int write_to_path(char *path, offset_t offset, char *buffer, int bytes)
 {
     START("write_to_path");
+
+    assert(path != NULL);
+    assert(offset > 0);
+    assert(buffer != NULL);
+    assert(bytes >= 0);
+
     return write_to_block(get_first_block_from_path(path), offset, buffer, bytes);
 
     END("write_to_path");
@@ -111,6 +134,7 @@ int write_to_path(char *path, offset_t offset, char *buffer, int bytes)
 
 blockno_t get_first_block_from_path(char *path)
 {
+    assert(path != NULL);
     START("get_first_block_from_path");
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
     {
@@ -126,6 +150,7 @@ blockno_t get_first_block_from_path(char *path)
 
 blockno_t get_first_block_from_inode(inode_t inode)
 {
+    assert(inode >= 0 && inode < NUM_FILES);
     START("get_first_block_from_inode");
     END("get_first_block_from_inode");
     return files[inode].start_block;
@@ -134,6 +159,7 @@ blockno_t get_first_block_from_inode(inode_t inode)
 
 blockno_t get_next_block(blockno_t blockno)
 {
+    assert(blockno >= 0 && blockno < NUM_BLOCKS);
     START("get_next_block");
     END("get_next_block");
     return blocks[blockno].next;
@@ -142,6 +168,7 @@ blockno_t get_next_block(blockno_t blockno)
 
 blockno_t get_or_create_next_block(blockno_t blockno)
 {
+    assert(blockno >= 0 && blockno < NUM_BLOCKS);
     START("get_or_create_next_block");
     // If next isn't allocated, allocate it
     if (blocks[blockno].next == -1)
@@ -167,7 +194,7 @@ blockno_t get_first_free_block()
     START("get_first_free_block");
     for (blockno_t i = 0; i < NUM_BLOCKS; i++)
     {
-        if (!blocks[i].allocated)
+        if (blocks[i].allocated == false)
         {
             return i;
 
@@ -180,10 +207,10 @@ blockno_t get_first_free_block()
 bool delete_block_chain(blockno_t start_block)
 {
     START("delete_block_chain");
+    assert(start_block > 0 && start_block < NUM_BLOCKS)
     if (start_block == -1)
     {
         return false;
-
     }
     blockno_t curr_block = start_block;
 
@@ -200,6 +227,8 @@ bool delete_block_chain(blockno_t start_block)
 
 inode_t create_file(char *path)
 {
+    assert(path != NULL);
+
     START("create_file");
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
     {
@@ -220,6 +249,7 @@ inode_t create_file(char *path)
 
 int delete_file(char *path)
 {
+    assert(path != NULL);
     START("delete_file");
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
     {
@@ -238,6 +268,7 @@ int delete_file(char *path)
 
 inode_t create_dir(char *path)
 {
+    assert(path != NULL);
     START("create_dir");
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
     {
@@ -258,6 +289,7 @@ inode_t create_dir(char *path)
 
 int delete_dir(char *path)
 {
+    assert(path != NULL);
     START("delete_dir");
     // TODO check for subfiles and shit
     return delete_file(path);
@@ -267,6 +299,7 @@ int delete_dir(char *path)
 
 void init_tfs(char *path)
 {
+    assert(path != NULL);
     START("init_tfs");
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
     {

@@ -483,10 +483,10 @@ int main(int argc, char *argv[])
 {
     START("main");
     assert(argc >= 2);
-    LOG("beginning init");
+    LOG1("beginning init");
     init_tfs(argv[1]);
     //remove the second argument
-    char *x[argc];
+    char *x = calloc(argc - 1, sizeof(char*));
     x[0] = argv[0];
     for (int i = 2; i < argc; i++)
     {
@@ -501,14 +501,16 @@ int main(int argc, char *argv[])
     {
         dir[di] = -1;
     }*/
-
+    LOG1("Setting up initial files");
     insert(".", 0);
     insert("..", 0);
     insert("file1", 0);
     insert("file2", 0);
     insert("new", 0);
+    LOG1("Done creating up initial files, writing data");
     iwrite(2, "Heyyy");
     iwrite(3, "Hi");
+    LOG1("Done setting up initial files");
     //dir[0] = 1; dir[1] = 1; dir[2] = 1; dir[3] = 1; dir[4] = 1;
 
 
