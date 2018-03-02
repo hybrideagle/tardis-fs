@@ -14,7 +14,6 @@
 #include "libtfs.h"
 
 
-
 const char* name[100];
 const char* content[100];
 int dir[100];
@@ -23,6 +22,7 @@ int file_count = 0;
 
 void insert(char* path, int mode)
 {
+        assert(path != NULL);
         assert(mode==1 || mode==2);
         //name[file_count] = strdup(path);
         //file_count++;
@@ -35,11 +35,12 @@ void insert(char* path, int mode)
 
 const char* get_path(inode_t inode)
 {
+        assert(inode > 0 && inode < file_count);
         //return name[inode];
         return files[inode].path;
 }
 
-const char* iread(int inode)
+const char* iread(inode_t inode)
 {
         //return content[inode];
         char* buf = (char*)malloc(sizeof(char)*1000);
@@ -118,14 +119,14 @@ void display()
         int i;
         for(i=0; i<file_count+1; i++)
         {
-                printf("\n%s",files[i].path);
+                LOG("\n%s",files[i].path);
         }
 }
 
 static int do_getattr( const char *path, struct stat *st )
 {
-        printf( "[getattr] Called\n" );
-        printf( "\tAttributes of %s requested\n", path );
+        LOG( "[getattr] Called\n" );
+        LOG( "\tAttributes of %s requested\n", path );
         st->st_uid = getuid();
         st->st_gid = getgid();
         st->st_atime = time(NULL);
@@ -138,32 +139,32 @@ static int do_getattr( const char *path, struct stat *st )
                 return 0;
         }
         int inode = getinode(strdup(path));
-        printf( "\tAttributes of %s[inode : %d] requested\n", path,inode );
-        printf("ISD = %d\n",isd(inode));
+        LOG( "\tAttributes of %s[inode : %d] requested\n", path,inode );
+        LOG("ISD = %d\n",isd(inode));
         if ( isd(inode)==1 )
         {
-                printf("DIRECTORY\n");
+                LOG("DIRECTORY\n");
                 st->st_mode = S_IFDIR | 0777;
                 st->st_nlink = 2;
-                printf("RETURNING 0\n");
+                LOG("RETURNING 0\n");
                 return 0;
         }
         else if ( isd(inode)==0 )
         {
-                printf("REGULAR\n");
+                LOG("REGULAR\n");
                 st->st_mode = S_IFREG | 0777;
                 st->st_nlink = 1;
                 st->st_size = 1024;
-                printf("RETURNING 0\n");
+                LOG("RETURNING 0\n");
                 return 0;
         }
         else if ( isd(inode)==-1)
         {
-                printf("REGULAR\n");
+                LOG("REGULAR\n");
                 st->st_mode = S_IFREG | 0777;
                 st->st_nlink = 1;
                 st->st_size = 1024;
-                printf("RETURNING NOENT\n");
+                LOG("RETURNING NOENT\n");
                 return -ENOENT;
         }
         int i = 0,j = 0;
@@ -175,7 +176,7 @@ static int do_getattr( const char *path, struct stat *st )
                 char* fpath2 = fpath;
                 if(strcmp(path,fpath2)==0)
                 {
-                        printf("RETURNING 0\n");
+                        LOG("RETURNING 0\n");
                         return 0;
                 }
                 for(j=0; j<10; j++)
@@ -183,21 +184,21 @@ static int do_getattr( const char *path, struct stat *st )
                         fpath[j]='\0';
                 }
         }
-        printf("RETURNING NOENT\n");
+        LOG("RETURNING NOENT\n");
         return -ENOENT;
 }
 
 static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi )
 {
         int i,j,count,root=0;
-        printf( "--> Getting The List of Files of %s\n", path );
+        LOG( "--> Getting The List of Files of %s\n", path );
         display();
         for(i = 0; i<file_count; i++)
         {
                 root = 0, count = 0;
                 for(j=0; j<strlen(get_path(i)); j++)
                 {
-                        printf("Testing : %d\t%c|\n",get_path(i)[j]-'/',get_path(i)[j]);
+                        LOG("Testing : %d\t%c|\n",get_path(i)[j]-'/',get_path(i)[j]);
                         if(get_path(i)[j]=='/')
                         {
                                 count++;
@@ -207,7 +208,7 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
                 {
                         root = 1;
                 }
-                printf("\nROOT = %d\n",root);
+                LOG("\nROOT = %d\n",root);
                 count = 0;
                 for(j=0; j<strlen(path)-1; j++)
                 {
@@ -231,7 +232,7 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
                                 c1++;
                         }
                 }
-                printf("%s - %d\n",path,c1);
+                LOG("%s - %d\n",path,c1);
                 for(j=0; j<strlen(get_path(i)); j++)
                 {
                         if(get_path(i)[j]-'/'==0)
@@ -247,17 +248,17 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
                 {
                         c1--;
                 }
-                printf("%s - %d\n",get_path(i), c2);
+                LOG("%s - %d\n",get_path(i), c2);
                 if(c2-c1>1)
                 {
                         count+=1000;
                 }
                 if(dir[i] ==-1)
                 {
-                        printf("Check Path >> %s\n",path);
+                        LOG("Check Path >> %s\n",path);
                         count+=100000;
                 }
-                printf("\nMismatch = %d\n_____________________\n",count);
+                LOG("\nMismatch = %d\n_____________________\n",count);
                 if(((strcmp(path,"/")==0 && root)||count ==0)&&(count<100000))
                 {
                         for(j=strlen(get_path(i))-1; j>=0; j--)
@@ -267,7 +268,7 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
                                         break;
                                 }
                         }
-                        printf("Show > %s , %d\n",get_path(i),j);
+                        LOG("Show > %s , %d\n",get_path(i),j);
 
                         int s = j;
                         char temp;
@@ -276,16 +277,16 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
                                 char temp[strlen(get_path(i))-j];
                                 for(j=0; j<strlen(get_path(i))-j-1; j++)
                                 {
-                                        printf("Buffering %c\n",strdup(get_path(j))[j+s+1]);
+                                        LOG("Buffering %c\n",strdup(get_path(j))[j+s+1]);
                                         temp[j] = strdup(get_path(i))[j+s+1];
                                 }
                                 temp[j]='\0';
-                                printf("Individual entry : %s\n\n",temp);
+                                LOG("Individual entry : %s\n\n",temp);
                                 filler( buffer, strdup(temp), NULL, 0 );
                         }
                         else
                         {
-                                printf("%s\n\n",get_path(i));
+                                LOG("%s\n\n",get_path(i));
                                 filler( buffer, strdup(get_path(i)), NULL, 0 );
                         }
                 }/*
@@ -294,7 +295,7 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
                         filler( buffer, get_path(i), NULL, 0 );
                     }*/
         }
-        printf("RETURN 0\n");
+        LOG("RETURN 0\n");
         return 0;
 
 }
@@ -302,7 +303,7 @@ static int do_readdir( const char *path, void *buffer, fuse_fill_dir_t filler, o
 static int do_read( const char *path, char *buffer, size_t size, off_t offset, struct fuse_file_info *fi )
 {
         /*int i,j;
-        printf( "--> Trying to read %s, %lu, %lu\n", path, offset, size );
+        LOG( "--> Trying to read %s, %lu, %lu\n", path, offset, size );
         char *selectedText = NULL;
 
         for(i=0; i<file_count; i++)
@@ -321,12 +322,12 @@ static int do_read( const char *path, char *buffer, size_t size, off_t offset, s
                         fpath[j]='\0';
                 }
         }
-        printf("\n%s\n",selectedText);
+        LOG("\n%s\n",selectedText);
 
         if(selectedText == NULL)
         {
 
-                printf("RETURN -1\n");
+                LOG("RETURN -1\n");
                 return -1;
         }
         memcpy( buffer, selectedText + offset, size );
@@ -336,7 +337,7 @@ static int do_read( const char *path, char *buffer, size_t size, off_t offset, s
 
 const int do_truncate(const char *path, off_t offset, struct fuse_file_info *fi)
 {
-        printf("RETURN 0\n");
+        LOG("RETURN 0\n");
         return 0;
 }
 
@@ -345,7 +346,7 @@ static int do_write(const char *path, const char * buffer, size_t size, off_t of
 /*
         int i,j;
         offset = 0;
-        printf("\nWrite Operation\n");
+        LOG("\nWrite Operation\n");
         for(i=0; i<file_count; i++)
         {
                 char fpath[PATH_LENGTH];
@@ -356,9 +357,9 @@ static int do_write(const char *path, const char * buffer, size_t size, off_t of
                 {
                         content[i] = strdup(buffer);
                         size = strlen(buffer);
-                        printf("Trying to write to file\n");
+                        LOG("Trying to write to file\n");
 
-                        printf("RETURN SIZE %ld\n",size);
+                        LOG("RETURN SIZE %ld\n",size);
                         return size;
                         break;
                 }
@@ -381,22 +382,22 @@ static int do_create(const char * path, mode_t mode,struct fuse_file_info *fi)
                 path2[i] = path[i+1];
         }
         path2[i] = '\0';
-        printf("\nTrying to create file %s\n",path2);
+        LOG("\nTrying to create file %s\n",path2);
         for(i=0; i<file_count; i++)
         {
 
                 if(strcmp(strdup(get_path(i)),strdup(path2))==0)
                 {
-                        printf("\nFile already exists.\n");
+                        LOG("\nFile already exists.\n");
                         break;
                 }
                 else
                 {
 //                        dir[file_count] = 1;
                         insert(strdup(path2), 0);
-                        printf("Insert Command Executed\n");
+                        LOG("Insert Command Executed\n");
 
-                        printf("RETURN 0\n");
+                        LOG("RETURN 0\n");
                         return 0;
                 }
         }
@@ -404,20 +405,20 @@ static int do_create(const char * path, mode_t mode,struct fuse_file_info *fi)
 
 static int do_access(const char *path, int mask)
 {
-        printf("do_access passthrough\n");
+        LOG("do_access passthrough\n");
         return 0;
 }
 
 static int do_setxattr (const char * path, size_t size)
 {
         size = 1024;
-        printf("do_setattr passthrough\n");
+        LOG("do_setattr passthrough\n");
         return 0;
 }
 static int do_mkdir(const char * path, mode_t mode)
 {
         mode = O_CREAT;
-        printf("Mkdir Called\n");
+        LOG("Mkdir Called\n");
         dir[file_count] = 2;
         int i;
         char path2[PATH_LENGTH];
@@ -440,9 +441,9 @@ static int do_mkdir(const char * path, mode_t mode)
 }
 static int do_unlink(const char* path)
 {
-        printf("Unlink called.\n");
+        LOG("Unlink called.\n");
         rmv(strdup(path));
-        printf(">>%d\n",dir[getinode(path)]);
+        LOG(">>%d\n",dir[getinode(path)]);
         display();
         return 0;
 }
@@ -467,9 +468,8 @@ static struct fuse_operations operations = {
 int main( int argc, char *argv[] )
 {
         assert(argc>=2);
-
+        LOG("beginning init");
         init_tfs(argv[1]);
-
         //remove the second argument
         char* x[argc];
         x[0] = argv[0];
