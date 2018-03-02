@@ -1,9 +1,23 @@
 #ifndef LIBTFS_H
 #define LIBTFS_H
+
+#define FUSE_USE_VERSION 30
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <fuse.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <string.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <assert.h>
+
 #define BLOCKSIZE 10 //bytes
 #define NUM_FILES 2 //number of files(inodes)
 #define NUM_BLOCKS 5 //number of blocks
