@@ -4,9 +4,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define BLOCKSIZE 1024 //bytes
-#define NUM_FILES 10 //number of files(inodes)
-#define NUM_BLOCKS 30 //number of blocks
+#define BLOCKSIZE 10 //bytes
+#define NUM_FILES 2 //number of files(inodes)
+#define NUM_BLOCKS 5 //number of blocks
 #define PATH_LENGTH 10 //number of characters in each path
 
 #ifndef assert
@@ -107,4 +107,9 @@ extern void sync();
 // Should be called at the beginning of main.
 extern void init_tfs(char* path);
 
+// Logging macros and constants
+#define START(args...) printf("[START]");printf(args);fflush(stdout);printf("\n");
+#define END(args...)   printf("[END]");printf(args);fflush(stdout);printf("\n");
+#define LOG(args...)   printf("[LOG]");printf(args);fflush(stdout);printf("\n");
+#define LOG1(args...)  printf("\t[LOG1]");printf(args);fflush(stdout);printf("\n");
 #endif //LIBTFS_H
