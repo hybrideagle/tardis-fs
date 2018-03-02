@@ -39,16 +39,16 @@ typedef int blockno_t;
 typedef int inode_t;
 
 
-typedef struct stats {
-        int st_ino; /* inode number */
-        int st_mode; /* protection */
-        unsigned int st_uid; /* user ID of owner */
-        unsigned int st_gid; /* group ID of owner */
+//typedef struct stats {
+//        int st_ino; /* inode number */
+//        int st_mode; /* protection */
+//        unsigned int st_uid; /* user ID of owner */
+//        unsigned int st_gid; /* group ID of owner */
 //    long st_size; /* total size, in bytes */
 //    long st_atime; /* time of last access */
 //    long st_mtime; /* time of last modification */
 //    long st_ctime; /* time of last status change */
-}stats;
+//}stats;
 
 typedef struct file {
         char path[PATH_LENGTH];
