@@ -67,7 +67,7 @@ int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
 
 int read_from_path(char *path, offset_t offset, char *buffer, int bytes)
 {
-    assert(path = NULL);
+    assert(path == NULL);
     assert(offset > 0);
     assert(buffer != NULL);
     assert(bytes >= 0);
@@ -207,7 +207,7 @@ blockno_t get_first_free_block()
 bool delete_block_chain(blockno_t start_block)
 {
     START("delete_block_chain");
-    assert(start_block > 0 && start_block < NUM_BLOCKS)
+    assert(start_block > 0 && start_block < NUM_BLOCKS);
     if (start_block == -1)
     {
         return false;
@@ -297,6 +297,20 @@ int delete_dir(char *path)
     END("delete_dir");
 }
 
+
+void sanity_check()
+{
+    assert(backing_storage_path != NULL);
+    assert(file_count >= 0);
+    for (blockno_t block = 0; block < NUM_BLOCKS; block++)
+    {
+        if(blocks[block].allocated == false)
+            assert(blocks[block].next == -1);
+        if(blocks[block].next == -1)
+            assert(blocks[block].allocated == false);
+    }
+}
+
 void init_tfs(char *path)
 {
     assert(path != NULL);
@@ -320,6 +334,7 @@ void init_tfs(char *path)
     pread(backing_storage_fd, blocks, sizeof(block)*NUM_BLOCKS, blocks_origin);
 
     END("init_tfs");
+    sanity_check();
 }
 
 void sync()
