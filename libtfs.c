@@ -39,7 +39,6 @@ int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
             printf("\nFile overread");
             return -1;
 
-            END("read_from_block");
         }
     }
     // start reading data
@@ -57,6 +56,7 @@ int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
         block = get_next_block(block);
     }
     return 0;
+    END("read_from_block");
 }
 
 int read_from_path(char *path, offset_t offset, char *buffer, int bytes)
@@ -81,7 +81,6 @@ int write_to_block(blockno_t block, offset_t offset, char *buffer, int bytes)
             printf("\nFile overread");
             return -1;
 
-            END("write_to_block");
         }
     }
     // start writing data
@@ -99,6 +98,7 @@ int write_to_block(blockno_t block, offset_t offset, char *buffer, int bytes)
         block = get_or_create_next_block(block);
     }
     return 0;
+    END("write_to_block");
 }
 
 int write_to_path(char *path, offset_t offset, char *buffer, int bytes)
@@ -118,26 +118,26 @@ blockno_t get_first_block_from_path(char *path)
         {
             return get_first_block_from_inode(inode);
 
-            END("get_first_block_from_path");
         }
     }
+    END("get_first_block_from_path");
     return -1;
 }
 
 blockno_t get_first_block_from_inode(inode_t inode)
 {
     START("get_first_block_from_inode");
+    END("get_first_block_from_inode");
     return files[inode].start_block;
 
-    END("get_first_block_from_inode");
 }
 
 blockno_t get_next_block(blockno_t blockno)
 {
     START("get_next_block");
+    END("get_next_block");
     return blocks[blockno].next;
 
-    END("get_next_block");
 }
 
 blockno_t get_or_create_next_block(blockno_t blockno)
@@ -154,11 +154,11 @@ blockno_t get_or_create_next_block(blockno_t blockno)
                 blocks[blockno].next = next;
                 assert(blocks[next].next == -1);
                 blocks[next].allocated = true;
-                END("get_or_create_next_block");
             }
         }
     }
 
+    END("get_or_create_next_block");
     return blocks[blockno].next;
 }
 
@@ -171,9 +171,9 @@ blockno_t get_first_free_block()
         {
             return i;
 
-            END("get_first_free_block");
         }
     }
+    END("get_first_free_block");
     return -1;
 }
 
@@ -184,7 +184,6 @@ bool delete_block_chain(blockno_t start_block)
     {
         return false;
 
-        END("delete_block_chain");
     }
     blockno_t curr_block = start_block;
 
@@ -195,6 +194,7 @@ bool delete_block_chain(blockno_t start_block)
         curr_block = blocks[curr_block].next;
     } while (curr_block != -1);
 
+    END("delete_block_chain");
     return true;
 }
 
@@ -212,9 +212,9 @@ inode_t create_file(char *path)
             files[inode].start_block = get_first_free_block();
             return inode;
 
-            END("create_file");
         }
     }
+    END("create_file");
     return -1;
 }
 
@@ -230,9 +230,9 @@ int delete_file(char *path)
             delete_block_chain(files[inode].start_block);
             return true;
 
-            END("delete_file");
         }
     }
+    END("delete_file");
     return false;
 }
 
@@ -250,9 +250,9 @@ inode_t create_dir(char *path)
             files[inode].start_block = get_first_free_block();
             return inode;
 
-            END("create_dir");
         }
     }
+    END("create_dir");
     return -1;
 }
 
@@ -271,18 +271,22 @@ void init_tfs(char *path)
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
     {
         files[inode].used = false;
-        END("init_tfs");
     }
+    LOG1("initialized files");
     for (blockno_t block = 0; block < NUM_BLOCKS; block++)
     {
         blocks[block].allocated = false;
         blocks[block].next = -1;
     }
+    LOG1("initialized blocks");
     backing_storage_path = strdup(path);
-    fseek(backing_storage, 0, 0);
-    fread(files, sizeof(files), NUM_FILES, backing_storage);
-    fseek(backing_storage, 0, blocks_origin);
-    fread(blocks, sizeof(blocks), NUM_FILES, backing_storage);
+    backing_storage = fopen(backing_storage_path, "w+");
+    int backing_storage_fd = fileno(backing_storage);
+
+    pread(backing_storage_fd, files, sizeof(files)*NUM_FILES, files_origin);
+    pread(backing_storage_fd, blocks, sizeof(block)*NUM_BLOCKS, blocks_origin);
+
+    END("init_tfs");
 }
 
 void sync()
@@ -308,7 +312,7 @@ int block_chain_length(blockno_t start_block)
     {
         size += BLOCKSIZE;
         start_block = blocks[start_block].next;
-        END("block_chain_length");
     } while (start_block != -1);
+    END("block_chain_length");
     return size;
 }
