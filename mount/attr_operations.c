@@ -77,7 +77,7 @@ int do_access(char *path, int mask)
 
 int do_setxattr(char *path, size_t size)
 {
-    START("");
+    START("do_setxattr");
     size = 1024;
     LOG("do_setattr passthrough\n");
     return 0;

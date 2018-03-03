@@ -7,7 +7,7 @@ void insert(char *path, int mode)
     assertd(path != NULL);
     assertd(mode == 0 || mode == 1);
     //name[file_count] = strdup(path);
-    //file_count++;
+    file_count++;
     if (mode == 0)
     {
         create_file(path);
@@ -103,14 +103,4 @@ int rmv(char *path)
     strcpy(files[i].path, strdup("@"));
     //dir[i] = -1;
     return 0;
-}
-
-void display()
-{
-    START("display");
-    int i;
-    for (i = 0; i < file_count + 1; i++)
-    {
-        LOG("\n%s", files[i].path);
-    }
 }

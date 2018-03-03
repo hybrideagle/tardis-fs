@@ -8,34 +8,11 @@
 //TODO add directories
 
 //TODO rename this
-FILE *get_data_handle(blockno_t block, offset_t offset)
-{
-    START("*get_data_handle");
-   assertd(offset < BLOCKSIZE);
 
-    FILE *handle = fopen(backing_storage_path, "rw+b");
-    fseek(handle, (block * BLOCKSIZE) + offset, blocks_origin);
-    return handle;
-
-    END("*get_data_handle");
-}
-
-void sanity_check()
-{
-   assertd(backing_storage_path != NULL);
-   assertd(file_count >= 0);
-    for (blockno_t block = 0; block < NUM_BLOCKS; block++)
-    {
-        if(blocks[block].allocated == false)
-           assertd(blocks[block].next == -1);
-        if(blocks[block].next == -1)
-           assertd(blocks[block].allocated == false);
-    }
-}
 
 void init_tfs(char *path)
 {
-   assertd(path != NULL);
+    assertd(path != NULL);
     START("init_tfs");
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
     {
@@ -52,8 +29,8 @@ void init_tfs(char *path)
     backing_storage = fopen(backing_storage_path, "w+");
     int backing_storage_fd = fileno(backing_storage);
 
-    pread(backing_storage_fd, files, sizeof(files)*NUM_FILES, files_origin);
-    pread(backing_storage_fd, blocks, sizeof(block)*NUM_BLOCKS, blocks_origin);
+    pread(backing_storage_fd, files, sizeof(files) * NUM_FILES, files_origin);
+    pread(backing_storage_fd, blocks, sizeof(block) * NUM_BLOCKS, blocks_origin);
 
     END("init_tfs");
     sanity_check();

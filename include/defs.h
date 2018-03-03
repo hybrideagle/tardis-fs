@@ -65,16 +65,6 @@ typedef struct block {
 file files[NUM_FILES];
 block blocks[NUM_BLOCKS];
 
-/* Structure of the backing storage:
-    The backing storage should contain binary data in the form:
-    1. Header:[sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM_BLOCKS bytes]
-        1. An array of `struct file`, length NUM_FILES   -> files
-        2. An array of `struct block`, length NUM_BLOCKS -> blocks
-    3. The actual block data in an array of `BLOCKSIZE` bytes, length NUM_BLOCKS
-        [NUM_BLOCKS*BLOCKSIZE bytes]
-    Sync should write all of the header to disk, data should be written immediately.
- */
-
 offset_t files_origin;
 offset_t blocks_origin;//sizeof(struct file)*NUM_FILES;
 offset_t data_origin;//sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM_BLOCKS;
@@ -86,7 +76,7 @@ offset_t data_origin;//sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM
 #define LOG1(args...)  printf("\t[LOG1]");printf(args);fflush(stdout);printf("\n");
 
 //Delimited assert
-#define assertd(args) printf("\n\n###########\n");assert(args);
+#define assertd(x) if(!(x))printf("\n\n###########\n");assert(x);
 //assertation that prints out a numeric value on crash
 #define numassert(x, num) if(!(x)) {printf("\n\n###########\n"); printf("%s:%d:assertion failed(%s:[%s=%d])", __FILE__, __LINE__, #x, #num, num); abort();}
 

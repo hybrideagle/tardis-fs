@@ -9,6 +9,11 @@ extern int delete_file(char* path);
 extern inode_t create_dir(char* path);
 extern int delete_dir(char* path);
 
+
+void display();
+void sanity_check();
+
+
 // for each block(as the index of the array), stores the next block's number
 extern blockno_t get_first_block_from_path(char* path);
 extern blockno_t get_first_block_from_inode(inode_t inode);

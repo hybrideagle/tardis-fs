@@ -17,7 +17,6 @@ void iwrite(int inode, char *text);
 int getinode(char *path);
 int isd(inode_t inode);
 int rmv(char *path);
-void display();
 char* get_path(inode_t inode);
-void sanity_check();
+
 #endif

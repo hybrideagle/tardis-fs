@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
     insert("file2", 0);
     insert("new", 0);
     sanity_check();
+    dump_data();
     LOG1("Done creating up initial files, writing data");
     iwrite(2, "Heyyy");
     iwrite(3, "Hi");
