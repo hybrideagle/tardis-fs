@@ -25,6 +25,13 @@ inode_t create_file(char *path)
     return -1;
 }
 
+void nullify_path_array(char* path)
+{
+    assert(path != NULL);
+    for(int i = 0; i<PATH_LENGTH; i++)
+        path[i] = '\0';
+}
+
 int delete_file(char *path)
 {
     assert(path != NULL);
@@ -34,7 +41,8 @@ int delete_file(char *path)
         if (!files[inode].used)
         {
             files[inode].used = false;
-            free(files[inode].path);
+            // free(files[inode].path);
+            nullify_path_array(files[inode].path);
             delete_block_chain(files[inode].start_block);
             return true;
 
