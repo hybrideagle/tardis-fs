@@ -4,8 +4,8 @@
 void insert(char *path, int mode)
 {
     START("insert");
-    assert(path != NULL);
-    assert(mode == 0 || mode == 1);
+    assertd(path != NULL);
+    assertd(mode == 0 || mode == 1);
     //name[file_count] = strdup(path);
     //file_count++;
     if (mode == 0)
@@ -21,7 +21,7 @@ void insert(char *path, int mode)
 char *get_path(inode_t inode)
 {
     START("get_path");
-    assert(inode > 0 && inode < file_count);
+    assertd(inode > 0 && inode < file_count);
     //return name[inode];
     return files[inode].path;
 }

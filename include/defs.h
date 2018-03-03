@@ -21,9 +21,6 @@
 #define NUM_BLOCKS 5 //number of blocks
 #define PATH_LENGTH 10 //number of characters in each path
 
-#ifndef assert
-    #define assert(x) if(!(x)) {printf("\nassertion failed:%s",#x); exit(1);}
-#endif
 
 // Global, holds the full path to the backing storage file
 char* backing_storage_path;
@@ -88,6 +85,10 @@ offset_t data_origin;//sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM
 #define LOG(args...)   printf("[LOG]");printf(args);fflush(stdout);printf("\n");
 #define LOG1(args...)  printf("\t[LOG1]");printf(args);fflush(stdout);printf("\n");
 
+//Delimited assert
+#define assertd(args) printf("\n\n###########\n");assert(args);
+//assertation that prints out a numeric value on crash
+#define numassert(x, num) if(!(x)) {printf("\n\n###########\n"); printf("%s:%d:assertion failed(%s:[%s=%d])", __FILE__, __LINE__, #x, #num, num); abort();}
 
 
 #endif //DEFS_H

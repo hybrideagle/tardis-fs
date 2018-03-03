@@ -19,7 +19,7 @@ int block_chain_length(blockno_t start_block)
 
 blockno_t get_first_block_from_inode(inode_t inode)
 {
-    assert(inode >= 0 && inode < NUM_FILES);
+   assertd(inode >= 0 && inode < NUM_FILES);
     START("get_first_block_from_inode");
     END("get_first_block_from_inode");
     return files[inode].start_block;
@@ -28,7 +28,7 @@ blockno_t get_first_block_from_inode(inode_t inode)
 
 blockno_t get_next_block(blockno_t blockno)
 {
-    assert(blockno >= 0 && blockno < NUM_BLOCKS);
+   assertd(blockno >= 0 && blockno < NUM_BLOCKS);
     START("get_next_block");
     END("get_next_block");
     return blocks[blockno].next;
@@ -37,7 +37,7 @@ blockno_t get_next_block(blockno_t blockno)
 
 blockno_t get_or_create_next_block(blockno_t blockno)
 {
-    assert(blockno >= 0 && blockno < NUM_BLOCKS);
+   assertd(blockno >= 0 && blockno < NUM_BLOCKS);
     START("get_or_create_next_block");
     // If next isn't allocated, allocate it
     if (blocks[blockno].next == -1)
@@ -48,7 +48,7 @@ blockno_t get_or_create_next_block(blockno_t blockno)
             if (blocks[next].allocated == false)
             {
                 blocks[blockno].next = next;
-                assert(blocks[next].next == -1);
+               assertd(blocks[next].next == -1);
                 blocks[next].allocated = true;
             }
         }
@@ -76,7 +76,7 @@ blockno_t get_first_free_block()
 bool delete_block_chain(blockno_t start_block)
 {
     START("delete_block_chain");
-    assert(start_block > 0 && start_block < NUM_BLOCKS);
+   assertd(start_block > 0 && start_block < NUM_BLOCKS);
     if (start_block == -1)
     {
         return false;

@@ -7,10 +7,10 @@ int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
 {
     START("read_from_block");
 
-    assert(block > 0 && block < NUM_BLOCKS);
-    assert(offset > 0);
-    assert(buffer != NULL);
-    assert(bytes >= 0);
+    numassert(block > 0 && block < NUM_BLOCKS, block);
+    numassert(offset > 0, offset);
+    assertd(buffer != NULL);
+    numassert(bytes >= 0, bytes);
 
     //seek to the correct block
     while (offset > BLOCKSIZE)
@@ -21,7 +21,6 @@ int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
         {
             printf("\nFile overread");
             return -1;
-
         }
     }
     // start reading data
@@ -39,6 +38,7 @@ int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
         block = get_next_block(block);
     }
     return 0;
+
     END("read_from_block");
 }
 
@@ -47,10 +47,10 @@ int write_to_block(blockno_t block, offset_t offset, char *buffer, int bytes)
 {
     START("write_to_block");
 
-    assert(block > 0 && block < NUM_BLOCKS);
-    assert(offset > 0);
-    assert(buffer != NULL);
-    assert(bytes >= 0);
+    numassert(block >= 0 && block < NUM_BLOCKS, block);
+    numassert(offset >= 0, offset);
+    assertd(buffer != NULL);
+    numassert(bytes >= 0, bytes);
 
     //seek to the correct block
     while (offset > BLOCKSIZE)
@@ -61,7 +61,6 @@ int write_to_block(blockno_t block, offset_t offset, char *buffer, int bytes)
         {
             printf("\nFile overread");
             return -1;
-
         }
     }
     // start writing data
@@ -79,16 +78,16 @@ int write_to_block(blockno_t block, offset_t offset, char *buffer, int bytes)
         block = get_or_create_next_block(block);
     }
     return 0;
+
     END("write_to_block");
 }
 
-
 int read_from_path(char *path, offset_t offset, char *buffer, int bytes)
 {
-    assert(path == NULL);
-    assert(offset > 0);
-    assert(buffer != NULL);
-    assert(bytes >= 0);
+    assertd(path != NULL);
+    numassert(offset > 0, offset);
+    assertd(buffer != NULL);
+    numassert(bytes >= 0, bytes);
 
     START("read_from_path");
     return read_from_block(get_first_block_from_path(path), offset, buffer, bytes);
@@ -96,15 +95,14 @@ int read_from_path(char *path, offset_t offset, char *buffer, int bytes)
     END("read_from_path");
 }
 
-
 int write_to_path(char *path, offset_t offset, char *buffer, int bytes)
 {
     START("write_to_path");
 
-    assert(path != NULL);
-    assert(offset > 0);
-    assert(buffer != NULL);
-    assert(bytes >= 0);
+    assertd(path != NULL);
+    numassert(offset > 0, offset);
+    assertd(buffer != NULL);
+    numassert(bytes >= 0, bytes);
 
     return write_to_block(get_first_block_from_path(path), offset, buffer, bytes);
 
@@ -113,14 +111,13 @@ int write_to_path(char *path, offset_t offset, char *buffer, int bytes)
 
 blockno_t get_first_block_from_path(char *path)
 {
-    assert(path != NULL);
+    assertd(path != NULL);
     START("get_first_block_from_path");
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
     {
         if (0 == strcmp(files[inode].path, path))
         {
             return get_first_block_from_inode(inode);
-
         }
     }
     END("get_first_block_from_path");

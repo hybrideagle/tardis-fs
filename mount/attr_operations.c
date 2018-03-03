@@ -3,7 +3,7 @@
 
 int do_getattr(char *path, struct stat *st)
 {
-    assert(path != NULL);
+    assertd(path != NULL);
     START("do_getattr");
     LOG("[getattr] Called\n");
     LOG("\tAttributes of %s requested\n", path);

@@ -5,7 +5,7 @@
 
 inode_t create_file(char *path)
 {
-    assert(path != NULL);
+   assertd(path != NULL);
 
     START("create_file");
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
@@ -27,14 +27,14 @@ inode_t create_file(char *path)
 
 void nullify_path_array(char* path)
 {
-    assert(path != NULL);
+   assertd(path != NULL);
     for(int i = 0; i<PATH_LENGTH; i++)
         path[i] = '\0';
 }
 
 int delete_file(char *path)
 {
-    assert(path != NULL);
+   assertd(path != NULL);
     START("delete_file");
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
     {
@@ -54,7 +54,7 @@ int delete_file(char *path)
 
 inode_t create_dir(char *path)
 {
-    assert(path != NULL);
+   assertd(path != NULL);
     START("create_dir");
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
     {
@@ -75,7 +75,7 @@ inode_t create_dir(char *path)
 
 int delete_dir(char *path)
 {
-    assert(path != NULL);
+   assertd(path != NULL);
     START("delete_dir");
     // TODO check for subfiles and shit
     return delete_file(path);

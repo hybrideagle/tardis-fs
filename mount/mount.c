@@ -26,11 +26,11 @@ static struct fuse_operations operations =
 int main(int argc, char *argv[])
 {
     START("main");
-    assert(argc >= 2);
+    assertd(argc >= 2);
     LOG1("beginning init");
     init_tfs(argv[1]);
     //remove the second argument
-    char** x = calloc(argc - 1, sizeof(char*));
+    char **x = calloc(argc - 1, sizeof(char *));
     x[0] = argv[0];
     for (int i = 2; i < argc; i++)
     {
@@ -41,10 +41,10 @@ int main(int argc, char *argv[])
 
 
     /*int di;
-    for (di = 0; di < 100; di++)
-    {
+       for (di = 0; di < 100; di++)
+       {
         dir[di] = -1;
-    }*/
+       }*/
     LOG1("Setting up initial files");
     insert(".", 0);
     insert("..", 0);

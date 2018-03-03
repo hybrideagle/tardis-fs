@@ -11,7 +11,7 @@
 FILE *get_data_handle(blockno_t block, offset_t offset)
 {
     START("*get_data_handle");
-    assert(offset < BLOCKSIZE);
+   assertd(offset < BLOCKSIZE);
 
     FILE *handle = fopen(backing_storage_path, "rw+b");
     fseek(handle, (block * BLOCKSIZE) + offset, blocks_origin);
@@ -22,20 +22,20 @@ FILE *get_data_handle(blockno_t block, offset_t offset)
 
 void sanity_check()
 {
-    assert(backing_storage_path != NULL);
-    assert(file_count >= 0);
+   assertd(backing_storage_path != NULL);
+   assertd(file_count >= 0);
     for (blockno_t block = 0; block < NUM_BLOCKS; block++)
     {
         if(blocks[block].allocated == false)
-            assert(blocks[block].next == -1);
+           assertd(blocks[block].next == -1);
         if(blocks[block].next == -1)
-            assert(blocks[block].allocated == false);
+           assertd(blocks[block].allocated == false);
     }
 }
 
 void init_tfs(char *path)
 {
-    assert(path != NULL);
+   assertd(path != NULL);
     START("init_tfs");
     for (inode_t inode = 0; inode < NUM_FILES; inode++)
     {
