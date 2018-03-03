@@ -1,6 +1,12 @@
 #include "include/libtfs.h"
 #include "mount.h"
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 void insert(char *path, int mode)
 {
     START("insert");
@@ -18,6 +24,12 @@ void insert(char *path, int mode)
     }
 }
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 char *get_path(inode_t inode)
 {
     START("get_path");
@@ -26,6 +38,12 @@ char *get_path(inode_t inode)
     return files[inode].path;
 }
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 char *iread(inode_t inode)
 {
     START("iread");
@@ -36,6 +54,12 @@ char *iread(inode_t inode)
     return buf;
 }
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 void iwrite(int inode, char *text)
 {
     START("iwrite");
@@ -43,6 +67,12 @@ void iwrite(int inode, char *text)
 }
 
 //TODO verify this works
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 int getinode(char *path)
 {
     START("getinode");
@@ -66,6 +96,12 @@ int getinode(char *path)
     return -1;
 }
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 int isd(int inode)
 {
     START("isd");
@@ -83,6 +119,12 @@ int isd(int inode)
     }
 }
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 int rmv(char *path)
 {
     START("rmv");

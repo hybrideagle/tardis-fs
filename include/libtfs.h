@@ -1,3 +1,12 @@
+/**
+* @file libtfs.h
+* @author Sumeet Padavala
+* @date 3 Mar 2018
+* @copyright 2018 Sumeet Padavala
+* @brief This header serves as the interface of the frontend code to the routines and structures that implement the tfs system.
+*
+*/
+
 #ifndef LIBTFS_H
 #define LIBTFS_H
 

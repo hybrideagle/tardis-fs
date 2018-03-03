@@ -3,6 +3,11 @@
 #include <assert.h>
 #include "include/libtfs.h"
 
+/**
+* @brief Create a new file in the file table with the given path
+* @param [in] path Path of the new file
+* @return inode of the new file
+*/
 inode_t create_file(char *path)
 {
    assertd(path != NULL);
@@ -25,13 +30,13 @@ inode_t create_file(char *path)
     return -1;
 }
 
-void nullify_path_array(char* path)
-{
-   assertd(path != NULL);
-    for(int i = 0; i<PATH_LENGTH; i++)
-        path[i] = '\0';
-}
 
+/**
+* @brief Remove a file from the file table
+* @param [in] path <parameter_description>
+* @return true on success, false on failure
+* @details <details>
+*/
 int delete_file(char *path)
 {
    assertd(path != NULL);
@@ -52,6 +57,11 @@ int delete_file(char *path)
     return false;
 }
 
+/**
+* @brief Create a new directory in the file table
+* @param [in] path full path to the new directory
+* @return inode number of the new directory
+*/
 inode_t create_dir(char *path)
 {
    assertd(path != NULL);
@@ -73,6 +83,12 @@ inode_t create_dir(char *path)
     return -1;
 }
 
+/**
+* @brief Delete a directory from the file table
+* @param [in] path
+* @return success?
+* @details <details>
+*/
 int delete_dir(char *path)
 {
    assertd(path != NULL);

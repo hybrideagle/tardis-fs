@@ -3,6 +3,12 @@
 #include <assert.h>
 #include "include/libtfs.h"
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 void display()
 {
     START("display");
@@ -13,6 +19,12 @@ void display()
     }
 }
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 bool valid_path(char* path)
 {
     assert(path != NULL);
@@ -20,6 +32,12 @@ bool valid_path(char* path)
 
 }
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 FILE *get_data_handle(blockno_t block, offset_t offset)
 {
     START("*get_data_handle");
@@ -33,6 +51,12 @@ FILE *get_data_handle(blockno_t block, offset_t offset)
     END("*get_data_handle");
 }
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 void sanity_check()
 {
     assertd(backing_storage_path != NULL);
@@ -54,6 +78,12 @@ void sanity_check()
     }
 }
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 void dump_data()
 {
     assertd(backing_storage_path != NULL);
@@ -83,6 +113,12 @@ void dump_data()
     LOG("\n>>>>>>>>>>>>>>>>>>\n\n");
 }
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 void init_logging()
 {
     //log_file = fopen("log", 'a');

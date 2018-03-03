@@ -45,25 +45,31 @@ typedef int inode_t;
 //    long st_ctime; /* time of last status change */
 //}stats;
 
+/*!
+   \brief A single entry in the file table, stores metadata of a single file
+*/
 typedef struct file {
-        char path[PATH_LENGTH];
-        blockno_t start_block;
-        bool is_dir;
-        bool used;
+        char path[PATH_LENGTH]; /*!< A fixed-length array storing the path(null-terminated) */
+        blockno_t start_block; /*!< First data block of the file */
+        bool is_dir; /*!< Is this file a directory? */
+        bool used; /*!< Is this file table entry in use? */
 //        stats stat;
 }file;
 
 // Current max inode
-inode_t file_count;
+inode_t file_count; /*!< Total count of allocated inodes */
 
+/*!
+   \brief Stores metadata of a single block
+*/
 typedef struct block {
-        blockno_t next; /* block number of the next block, -1 if N/A */
-        bool allocated; /* is this block in use? */
+        blockno_t next; /*<! block number of the next block, -1 if N/A */
+        bool allocated; /*<! is this block in use? */
 }block;
 
 
-file files[NUM_FILES];
-block blocks[NUM_BLOCKS];
+file files[NUM_FILES];/*!< Array of struct file, stores the file table */
+block blocks[NUM_BLOCKS];/*!< Array of block structures, stores block metadata */
 
 offset_t files_origin;
 offset_t blocks_origin;//sizeof(struct file)*NUM_FILES;

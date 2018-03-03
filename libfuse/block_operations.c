@@ -4,6 +4,12 @@
 #include "include/libtfs.h"
 
 //TODO make this function respect half-filled blocks
+
+/**
+* @brief Get the length of a chain of blocks
+* @param [in] start_block first block in the chain
+* @return size of the chain in bytes
+*/
 int block_chain_length(blockno_t start_block)
 {
     START("block_chain_length");
@@ -17,6 +23,11 @@ int block_chain_length(blockno_t start_block)
     return size;
 }
 
+/**
+* @brief Return the start of the block chain for a certain inode
+* @param [in] inode
+* @return blockno
+*/
 blockno_t get_first_block_from_inode(inode_t inode)
 {
     assertd(inode >= 0 && inode < NUM_FILES);
@@ -25,6 +36,12 @@ blockno_t get_first_block_from_inode(inode_t inode)
     return files[inode].start_block;
 }
 
+/**
+* @brief Given a block, get the next block
+* @param [in] blockno current block number
+* @return next block number
+* @details <details>
+*/
 blockno_t get_next_block(blockno_t blockno)
 {
     assertd(blockno >= 0 && blockno < NUM_BLOCKS);
@@ -33,6 +50,12 @@ blockno_t get_next_block(blockno_t blockno)
     return blocks[blockno].next;
 }
 
+/**
+* @brief <brief>
+* @param [in] <name> <parameter_description>
+* @return <return_description>
+* @details <details>
+*/
 blockno_t get_or_create_next_block(blockno_t blockno)
 {
     assertd(blockno >= 0 && blockno < NUM_BLOCKS);
@@ -56,6 +79,12 @@ blockno_t get_or_create_next_block(blockno_t blockno)
     return blocks[blockno].next;
 }
 
+
+//TODO fix this function
+/**
+* @brief Get the lowest numbered unallocated block
+* @return Required block number
+*/
 blockno_t get_first_free_block()
 {
     START("get_first_free_block");
@@ -63,6 +92,12 @@ blockno_t get_first_free_block()
     {
         if (blocks[i].allocated == false)
         {
+            blocks[i].allocated = true;
+            FILE* handle = get_data_handle(i,0);
+            for (size_t i = 0; i < BLOCKSIZE; i++) {
+                fputc('\0', handle);
+            }
+            fclose(handle);
             return i;
         }
     }
@@ -70,6 +105,11 @@ blockno_t get_first_free_block()
     return -1;
 }
 
+/**
+* @brief Free a chain of blocks
+* @param [in] start_block First block in the chain
+* @return succeded?
+*/
 bool delete_block_chain(blockno_t start_block)
 {
     START("delete_block_chain");

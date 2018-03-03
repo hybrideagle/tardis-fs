@@ -10,6 +10,10 @@
 //TODO rename this
 
 //TODO make this take a path from command line
+/**
+* @brief Sets up the internal data
+* @details This function should be called right at the beginning of main().
+*/
 void init_tfs()
 {
     backing_storage_path = (char*)malloc(100);
@@ -38,6 +42,10 @@ void init_tfs()
     sanity_check();
 }
 
+/**
+* @brief Sync all the data to backing store
+* @details Writes all the metadata(not thread-safe), and then calls fsync to update the data.
+*/
 void sync()
 {
     START("sync");
