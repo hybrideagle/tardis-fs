@@ -4,10 +4,10 @@ An implementation of the TARDIS single-file filesystem.
 # Why TARDIS?
 For those who live under a rock, the name comes from the iconic time-traveling machine from the TV series _Doctor Who_, which is:
 1. Awesome
-2. But more relevantly, bigger on the inside, which is what a single file filesystem is supposed to be.
+2. But more relevantly, bigger on the inside, which is what a single-file filesystem is supposed to be.
 
 ## But what about copyright?
-If BBC sends me a cease-and-desist letter, I will frame it.
+If the BBC sends me a cease-and-desist letter, I will frame it.
 
 # Build instructions
 This project uses the meson build system. To use it, you must have meson and ninja-build installed.
@@ -18,10 +18,12 @@ This project uses the meson build system. To use it, you must have meson and nin
 4. `ninja`
 
 Recompiling only requires you to rerun `ninja`, if will automatically run `meson` if necessary.
-If you really hate anything new or cool, there is also a (outdated) `make` file.
-Good look getting it working.
+
+`ninja run` will execute the run script.
+`ninja scan-build` runs the Clang static analysis tool, if you have it installed.
 
 # Known issues
 
-1. The `libtfs.h` header is getting included multiple times, despite the header guard.
-Could cause problems later.
+1. block_chain_length does not respect half-filled blocks.
+2. do_readdir is monstrously complicated.
+3. The utils.c functions are not properly tested, will probably bug out later.
