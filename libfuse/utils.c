@@ -59,23 +59,31 @@ void dump_data()
     assertd(backing_storage_path != NULL);
     numassert(file_count >= 0, file_count);
 
-    printf("\n\n>>>>>>>>>>>>>>>>>>");
-    printf("\nBLOCK METADATA:");
-    for (blockno_t block = 0; block < NUM_BLOCKS; block++)
-    {
-        printf("\nBlock %d:\n", block);
-        printf("\n\tallocated:%d", blocks[block].allocated);
-        printf("\n\tnext:%d", blocks[block].next);
-
-    }
-    printf("\n\n>>>");
-    printf("\nFILE METADATA:");
+    LOG("\n\n>>>>>>>>>>>>>>>>>>");
+    LOG("\nFILE METADATA:");
     for(inode_t inode = 0; inode < file_count; inode++)
     {
-        printf("\nFile %d:\n", inode);
-        printf("\n\tused:%d", files[inode].used);
-        printf("\n\tis_dir:%d", files[inode].is_dir);
-        printf("\n\tpath:%s", files[inode].path);
+        LOG("File %d:", inode);
+        LOG1("used:%d", files[inode].used);
+        LOG1("first:%d", files[inode].start_block);
+        LOG1("path:%s", files[inode].path);
+        LOG1("is_dir:%d", files[inode].is_dir);
     }
-    printf("\n>>>>>>>>>>>>>>>>>>\n\n");
+
+    LOG("\n\n>>>");
+
+    LOG("\nBLOCK METADATA:");
+    for (blockno_t block = 0; block < NUM_BLOCKS; block++)
+    {
+        LOG("Block %d:", block);
+        LOG1("allocated:%d", blocks[block].allocated);
+        LOG1("next:%d", blocks[block].next);
+
+    }
+    LOG("\n>>>>>>>>>>>>>>>>>>\n\n");
+}
+
+void init_logging()
+{
+    //log_file = fopen("log", 'a');
 }

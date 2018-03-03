@@ -17,8 +17,8 @@
 #include <assert.h>
 
 #define BLOCKSIZE 10 //bytes
-#define NUM_FILES 2 //number of files(inodes)
-#define NUM_BLOCKS 5 //number of blocks
+#define NUM_FILES 4 //number of files(inodes)
+#define NUM_BLOCKS 10 //number of blocks
 #define PATH_LENGTH 10 //number of characters in each path
 
 
@@ -68,6 +68,10 @@ block blocks[NUM_BLOCKS];
 offset_t files_origin;
 offset_t blocks_origin;//sizeof(struct file)*NUM_FILES;
 offset_t data_origin;//sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM_BLOCKS;
+
+void init_logging();
+
+FILE* log_file;
 
 // Logging macros and constants
 #define START(args...) printf("(%s)[START]", __FILE__);printf(args);fflush(stdout);printf("\n");
