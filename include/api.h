@@ -13,6 +13,7 @@ extern int delete_dir(char* path);
 void display();
 void sanity_check();
 
+void nullify_path_array(char* path);
 
 // for each block(as the index of the array), stores the next block's number
 extern blockno_t get_first_block_from_path(char* path);

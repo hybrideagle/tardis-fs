@@ -123,3 +123,9 @@ void init_logging()
 {
     //log_file = fopen("log", 'a');
 }
+
+void nullify_path_array(char* path)
+{
+    for(int i = 0;i < PATH_LENGTH; i++)
+        path[i] = '\0';
+}
