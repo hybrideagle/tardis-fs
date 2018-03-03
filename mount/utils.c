@@ -64,6 +64,7 @@ void iwrite(int inode, char *text)
 {
     START("iwrite");
     write_to_block(files[inode].start_block, 0, text, strlen(text));
+    LOG("size:%d",strlen(text));
 }
 
 //TODO verify this works
@@ -143,6 +144,6 @@ int rmv(char *path)
        dir[i] = -1;
      */
     strcpy(files[i].path, strdup("@"));
-    //dir[i] = -1;
+    files[i].used = false;
     return 0;
 }

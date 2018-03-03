@@ -35,7 +35,12 @@ int do_read(char *path, char *buffer, size_t size, off_t offset, struct fuse_fil
        }
        memcpy( buffer, selectedText + offset, size );
        return strlen( selectedText ) - offset;*/
-    return read_from_path(path, offset, buffer, size);
+    char *selectedText;
+    size = 10;
+    return read_from_path(path, offset, selectedText, size);
+    memcpy( buffer, selectedText + offset, size );
+    LOG("%s",buffer);
+    return strlen( selectedText ) - offset;
 }
 
 int do_truncate(char *path, off_t offset, struct fuse_file_info *fi)
@@ -76,7 +81,9 @@ int do_write(char *path, char *buffer, size_t size, off_t offset, struct fuse_fi
         }
         return size;
  */
-    return write_to_path(path, offset, buffer, size);
+    //return write_to_path(path, offset, buffer, size);
+    iwrite(getinode(path),buffer);
+    return size-offset;
 }
 
 int do_create(char *path, mode_t mode, struct fuse_file_info *fi)

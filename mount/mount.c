@@ -1,4 +1,4 @@
-#include "include/libtfs.h"
+#include "../include/libtfs.h"
 #include "mount.h"
 #include <stddef.h>
 //char *name[100];
@@ -103,5 +103,5 @@ int main(int argc, char *argv[])
     dump_data();
 
     LOG1("Deferring to fuse_main...");
-    //return fuse_main(args.argc, args.argv, &operations, NULL);
+    return fuse_main(args.argc, args.argv, &operations, NULL);
 }

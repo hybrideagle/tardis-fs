@@ -3,11 +3,14 @@
 /**
 Setup the inital values of files and blocks
 */
-void init_internal_data(){
-    for(inode_t inode = 0;inode<NUM_FILES;inode++){
+void init_internal_data()
+{
+    for(inode_t inode = 0;inode<NUM_FILES;inode++)
+    {
             files[inode].used = false;
     }
-    for(blockno_t block = 0;block<NUM_BLOCKS;block++){
+    for(blockno_t block = 0;block<NUM_BLOCKS;block++)
+    {
             blocks[block].allocated = false;
             blocks[block].next = -1;
     }
@@ -16,12 +19,14 @@ void init_internal_data(){
 
 }
 
-void open_backing_storage_file(char* path){
+void open_backing_storage_file(char* path)
+{
     backing_storage_path = path;
     backing_storage = fopen(path,"w+b");
 }
 
-void write_backing_storage(char* path){
+void write_backing_storage(char* path)
+{
     init_internal_data();
     open_backing_storage_file(path);
     printf("\n[INFO]sizeof(block):%d",sizeof(block));
@@ -42,18 +47,22 @@ void write_backing_storage(char* path){
 
     //sync();
     fseek(backing_storage, 0, data_origin);
-    for(blockno_t record = 0; record < NUM_BLOCKS; record++){
-        for(offset_t offset = 0; offset < BLOCKSIZE; offset++){
+    for(blockno_t record = 0; record < NUM_BLOCKS; record++)
+    {
+        for(offset_t offset = 0; offset < BLOCKSIZE; offset++)
+        {
             fputc((record+offset)%255, backing_storage);
         }
     }
 }
 
-void print_usage(){
+void print_usage()
+{
     printf("Usage: mkfs.tfs [path/to/backing/file]\n");
 }
 
-int main(int argc, char**argv){
+int main(int argc, char**argv)
+{
     if(argc != 2){
         print_usage();
         return -1;

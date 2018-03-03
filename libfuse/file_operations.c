@@ -18,7 +18,7 @@ inode_t create_file(char *path)
         if (!files[inode].used)
         {
             files[inode].used = true;
-            files[inode].is_dir = true;
+            files[inode].is_dir = false;
             //files[inode].path = path
             strcpy(files[inode].path, path);
             files[inode].start_block = get_first_free_block();

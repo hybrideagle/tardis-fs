@@ -68,14 +68,12 @@ int do_readdir(char *path, void *buffer, fuse_fill_dir_t filler, off_t offset, s
         {
             count += 1000;
         }
-        // TODO figure out how to fix this monster code
-        /*
-if (dir[i] == -1)
+
+        if (files[i].used==false)
         {
             LOG("Check Path >> %s\n", path);
             count += 100000;
-        }*/
-
+        }
 
         LOG("\nMismatch = %d\n_____________________\n", count);
         if (((strcmp(path, "/") == 0 && root) || count == 0) && (count < 100000))
@@ -108,11 +106,13 @@ if (dir[i] == -1)
                 LOG("%s\n\n", get_path(i));
                 filler(buffer, strdup(get_path(i)), NULL, 0);
             }
-        }        /*
-                    if(strlen(path)==1 && root)
-                    {
-                        filler( buffer, get_path(i), NULL, 0 );
-                    }*/
+        }
+        /*
+        if(strlen(path)==1 && root)
+        {
+            filler( buffer, get_path(i), NULL, 0 );
+        }
+        */
     }
     LOG("RETURN 0\n");
     return 0;

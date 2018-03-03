@@ -17,7 +17,7 @@
 #include <assert.h>
 
 #define BLOCKSIZE 10 //bytes
-#define NUM_FILES 4 //number of files(inodes)
+#define NUM_FILES 10 //number of files(inodes)
 #define NUM_BLOCKS 10 //number of blocks
 #define PATH_LENGTH 10 //number of characters in each path
 
@@ -62,7 +62,7 @@ inode_t file_count; /*!< Total count of allocated inodes */
 /*!
    \brief Stores metadata of a single block
 */
-typedef struct block {
+typedef struct block{
         blockno_t next; /*<! block number of the next block, -1 if N/A */
         bool allocated; /*<! is this block in use? */
 }block;
