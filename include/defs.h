@@ -70,7 +70,7 @@ offset_t blocks_origin;//sizeof(struct file)*NUM_FILES;
 offset_t data_origin;//sizeof(struct file)*NUM_FILES + sizeof(struct blocks)*NUM_BLOCKS;
 
 // Logging macros and constants
-#define START(args...) printf("[START]");printf(args);fflush(stdout);printf("\n");
+#define START(args...) printf("(%s)[START]", __FILE__);printf(args);fflush(stdout);printf("\n");
 #define END(args...)   printf("[END]");printf(args);fflush(stdout);printf("\n");
 #define LOG(args...)   printf("[LOG]");printf(args);fflush(stdout);printf("\n");
 #define LOG1(args...)  printf("\t[LOG1]");printf(args);fflush(stdout);printf("\n");

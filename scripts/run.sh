@@ -5,7 +5,7 @@ rm -f blargh
 echo "##########################"
 echo "Setting up filesystem..."
 ./mkfs.tfs ./blargh
-mkdir /tmp/a
+mkdir x
 echo "##########################"
 echo "Mounting filesystem..."
-./mount.tfs ./blargh /tmp/a -f -v
+./mount.tfs -f ./x 

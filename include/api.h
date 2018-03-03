@@ -41,6 +41,6 @@ extern void sync();
 
 // Initializes the backing store, using the given path to the backing store file.
 // Should be called at the beginning of main.
-extern void init_tfs(char* path);
+extern void init_tfs();
 
 #endif //API_H

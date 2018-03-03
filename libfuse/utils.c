@@ -13,11 +13,19 @@ void display()
     }
 }
 
+bool valid_path(char* path)
+{
+    assert(path != NULL);
+    assert(path[0] != '\0');
+
+}
+
 FILE *get_data_handle(blockno_t block, offset_t offset)
 {
     START("*get_data_handle");
-    assertd(offset < BLOCKSIZE);
-
+    numassert(offset >= 0 && offset < BLOCKSIZE, offset);
+    numassert(block >= 0 && block < NUM_BLOCKS, block);
+    assert(valid_path(backing_storage_path));
     FILE *handle = fopen(backing_storage_path, "rw+b");
     fseek(handle, (block * BLOCKSIZE) + offset, blocks_origin);
     return handle;
@@ -33,11 +41,7 @@ void sanity_check()
     {
         if (blocks[block].allocated == false)
         {
-            assertd(blocks[block].next == -1);
-        }
-        if (blocks[block].next == -1)
-        {
-            assertd(blocks[block].allocated == false);
+            numassert(blocks[block].next == -1, block);
         }
     }
     for(inode_t inode = 0; inode < file_count; inode++)

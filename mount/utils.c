@@ -21,7 +21,7 @@ void insert(char *path, int mode)
 char *get_path(inode_t inode)
 {
     START("get_path");
-    assertd(inode > 0 && inode < file_count);
+    assertd(inode >= 0 && inode < file_count);
     //return name[inode];
     return files[inode].path;
 }
