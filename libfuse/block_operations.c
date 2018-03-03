@@ -1,7 +1,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
-#include "libtfs.h"
+#include "include/libtfs.h"
 
 //TODO make this function respect half-filled blocks
 int block_chain_length(blockno_t start_block)

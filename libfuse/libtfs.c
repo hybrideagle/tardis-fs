@@ -2,7 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
-#include "libtfs.h"
+#include "include/libtfs.h"
 
 //TODO add file size calculation
 //TODO add directories

@@ -1,7 +1,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
-#include "libtfs.h"
+#include "include/libtfs.h"
 
 int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
 {

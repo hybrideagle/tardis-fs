@@ -1,7 +1,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
-#include "libtfs.h"
+#include "include/libtfs.h"
 
 inode_t create_file(char *path)
 {
