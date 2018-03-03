@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     LOG1("beginning init");
     init_tfs(argv[1]);
     //remove the second argument
-    char *x = calloc(argc - 1, sizeof(char*));
+    char** x = calloc(argc - 1, sizeof(char*));
     x[0] = argv[0];
     for (int i = 2; i < argc; i++)
     {
