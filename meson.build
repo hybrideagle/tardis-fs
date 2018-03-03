@@ -15,8 +15,11 @@ libfuse_includes = include_directories('include')
 
 # set up the mkfs.tfs executable
 mkfs_name = 'mkfs.tfs'
-executable(mkfs_name,mkfs_sources, cpp_args: cpp_args, link_args: link_args, include_directories: libfuse_includes, link_with: libfuse)
+executable(mkfs_name, mkfs_sources, cpp_args: cpp_args, link_args: link_args, include_directories: libfuse_includes, link_with: libfuse)
 
 # Set up building the mount.tfs executable
 mount_name = 'mount.tfs'
 executable(mount_name, mount_sources, cpp_args: cpp_args, link_args: link_args, include_directories: libfuse_includes, link_with: libfuse)
+
+
+run_target('run', command:'scripts/run.sh')
