@@ -73,6 +73,8 @@ static int tfs_opt_proc(void *data, const char *arg, int key, struct fuse_args *
 
 int main(int argc, char *argv[])
 {
+    init_tfs(NULL,true);
+    dump_data();
     init_logging();
     START("main");
     //numassert(argc >= 3, argc);
@@ -84,7 +86,6 @@ int main(int argc, char *argv[])
     memset(&conf, 0, sizeof(conf));
     fuse_opt_parse(&args, &conf, tfs_opts, tfs_opt_proc);
 
-    init_tfs();
 
     LOG1("Setting up initial files");
     insert(".", 0);
@@ -99,8 +100,8 @@ int main(int argc, char *argv[])
     iwrite(3, "Hi");
     LOG1("Done setting up initial files");
 
-    sanity_check();
-    dump_data();
+    //sanity_check();
+    //dump_data();
 
     LOG1("Deferring to fuse_main...");
     return fuse_main(args.argc, args.argv, &operations, NULL);
