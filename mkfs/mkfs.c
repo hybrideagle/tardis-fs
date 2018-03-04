@@ -3,21 +3,6 @@
 /**
 Setup the inital values of files and blocks
 */
-void init_internal_data()
-{
-    for(inode_t inode = 0;inode<NUM_FILES;inode++)
-    {
-            files[inode].used = false;
-    }
-    for(blockno_t block = 0;block<NUM_BLOCKS;block++)
-    {
-            blocks[block].allocated = false;
-            blocks[block].next = -1;
-    }
-    blocks_origin = sizeof(file)*NUM_FILES;
-    data_origin = sizeof(file)*NUM_FILES + sizeof(block)*NUM_BLOCKS;
-
-}
 
 void open_backing_storage_file(char* path)
 {
@@ -27,32 +12,19 @@ void open_backing_storage_file(char* path)
 
 void write_backing_storage(char* path)
 {
-    init_internal_data();
+    init_tfs(NULL, false);
+    blocks[3].allocated = true;
     open_backing_storage_file(path);
-    printf("\n[INFO]sizeof(block):%d",sizeof(block));
-    printf("\n[INFO]sizeof(file):%d",sizeof(file));
-    printf("\nUsing block offset:%d",blocks_origin);
-    printf("\nUsing data offset:%d",data_origin);
-    printf("\nUsing BLOCKSIZE:%d",BLOCKSIZE);
-    printf("\nUsing NUM_FILES:%d",NUM_FILES);
-    printf("\nUsing NUM_BLOCKS:%d",NUM_BLOCKS);
-    printf("\nInit complete");
-    fseek(backing_storage, 0, 0);
-    fwrite(files, sizeof(files), NUM_FILES, backing_storage);
-    printf("\nFinished writing file list");
-    fseek(backing_storage, 0, blocks_origin);
-    printf("\nFinished writing block list");
-    fwrite(blocks, sizeof(blocks), NUM_FILES, backing_storage);
-    printf("\nFinished writing block list");
+    sync_metadata();
 
-    //sync();
-    fseek(backing_storage, 0, data_origin);
+    //sync_metadata();
+    char filler[BLOCKSIZE];
+    for(int i = 0;i<BLOCKSIZE;i++)
+        filler[i] = 5;
+
     for(blockno_t record = 0; record < NUM_BLOCKS; record++)
     {
-        for(offset_t offset = 0; offset < BLOCKSIZE; offset++)
-        {
-            fputc((record+offset)%255, backing_storage);
-        }
+        pwrite(fileno(backing_storage), filler, BLOCKSIZE, data_origin + record*BLOCKSIZE);
     }
 }
 
@@ -68,6 +40,7 @@ int main(int argc, char**argv)
         return -1;
     }
     write_backing_storage(argv[1]);
+    dump_data();
     printf("\nDone");
     return 0;
 }
