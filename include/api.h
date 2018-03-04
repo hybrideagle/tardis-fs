@@ -39,7 +39,7 @@ extern int block_chain_length(blockno_t start_block);
 
 FILE* get_data_handle(blockno_t blockno, offset_t offset);
 //sync the headers to disk. Data should auto-sync(passthrough).
-extern void sync();
+extern void sync_metadata();
 
 // Initializes the backing store, using the given path to the backing store file.
 // Should be called at the beginning of main.
