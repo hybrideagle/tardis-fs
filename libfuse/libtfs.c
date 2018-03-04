@@ -10,52 +10,73 @@
 //TODO rename this
 
 //TODO make this take a path from command line
+
 /**
-* @brief Sets up the internal data
-* @details This function should be called right at the beginning of main().
-*/
-void init_tfs()
+ * @brief Sets up the internal data
+ * @details This function should be called right at the beginning of main(). Must be called before any libtfs functions
+ */
+void init_tfs(char* path, bool read_from_backing_storage)
 {
-    backing_storage_path = (char*)malloc(100);
-    sprintf(backing_storage_path, "blargh");
+    files_origin = 0;
+    blocks_origin = files_origin + sizeof(file) * NUM_FILES;
+    data_origin = blocks_origin + sizeof(block) * NUM_BLOCKS;
+    LOG("setting data origin:%d, %d",data_origin);
+    backing_storage_path = (path==NULL)?"blargh":path;
 
     START("init_tfs");
-    for (inode_t inode = 0; inode < NUM_FILES; inode++)
+
+    if(!read_from_backing_storage)
     {
-        files[inode].used = false;
+        LOG("Using default data");
+        for (inode_t inode = 0; inode < NUM_FILES; inode++)
+        {
+            files[inode].used = false;
+            for(int i = 0; i < PATH_LENGTH; i++)
+            //        files[inode].path[i] = '\0';
+            files[inode].path[i] = 7;
+
+        }
+        LOG1("initialized files");
+        for (blockno_t block = 0; block < NUM_BLOCKS; block++)
+        {
+            blocks[block].allocated = false;
+            blocks[block].next = -1;
+        }
+        LOG1("initialized blocks");
     }
-    LOG1("initialized files");
-    for (blockno_t block = 0; block < NUM_BLOCKS; block++)
+
+    else
     {
-        blocks[block].allocated = false;
-        blocks[block].next = -1;
+        LOG("Reading from backing storage");
+        backing_storage = fopen(backing_storage_path, "r+");
+        pread(fileno(backing_storage), files, sizeof(files), files_origin);
+        pread(fileno(backing_storage), blocks, sizeof(blocks), blocks_origin);
+//        sync_metadata();
+    //    data_dump();
     }
-    LOG1("initialized blocks");
-
-    backing_storage = fopen(backing_storage_path, "w+");
-    int backing_storage_fd = fileno(backing_storage);
-
-    pread(backing_storage_fd, files, sizeof(files) * NUM_FILES, files_origin);
-    pread(backing_storage_fd, blocks, sizeof(block) * NUM_BLOCKS, blocks_origin);
-
+    LOG1("data dump:");
+    LOG1("NUM_FILES:%d", NUM_FILES);
+    LOG1("NUM_BLOCKS:%d", NUM_BLOCKS);
+    LOG1("PATH_LENGTH:%d", PATH_LENGTH);
+    LOG1("files_origin:%d", files_origin);
+    LOG1("blocks_origin:%d", blocks_origin);
+    LOG1("data_origin:%d", data_origin);
+    LOG1("sizeof(block):%d", sizeof(struct block));
+    LOG1("sizeof(file):%d", sizeof(struct file));
     END("init_tfs");
-    sanity_check();
+//    dump_data();
+//    sanity_check();
 }
 
 /**
-* @brief Sync all the data to backing store
-* @details Writes all the metadata(not thread-safe), and then calls fsync to update the data.
-*/
-void sync()
+ * @brief Sync all the data to backing store
+ * @details Writes all the metadata(not thread-safe), and then calls fsync to update the data.
+ */
+void sync_metadata()
 {
     START("sync");
-    files_origin = 0;
-    blocks_origin = sizeof(file) * NUM_FILES;
-    data_origin = sizeof(file) * NUM_FILES + sizeof(blocks) * NUM_BLOCKS;
-    fseek(backing_storage, 0, 0);
-    fwrite(files, sizeof(files), NUM_FILES, backing_storage);
-    fseek(backing_storage, 0, blocks_origin);
-    fwrite(blocks, sizeof(blocks), NUM_FILES, backing_storage);
+    pwrite(fileno(backing_storage), files, sizeof(files), files_origin);
+    pwrite(fileno(backing_storage), blocks, sizeof(blocks), blocks_origin);
     fsync(fileno(backing_storage));
     END("sync");
 }
