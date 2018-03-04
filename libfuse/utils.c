@@ -43,13 +43,17 @@ FILE *get_data_handle(blockno_t block, offset_t offset)
     START("*get_data_handle");
     numassert(offset >= 0 && offset < BLOCKSIZE, offset);
     numassert(block >= 0 && block < NUM_BLOCKS, block);
-    assert(valid_path(backing_storage_path));
+    assert(backing_storage_path != NULL);
     FILE *handle = fopen(backing_storage_path, "rw+b");
-    LOG("fseek");
     fseek(handle, (block * BLOCKSIZE) + offset, blocks_origin);
+<<<<<<< HEAD
     LOG("%d , %d",(block * BLOCKSIZE) + offset,blocks_origin);
     LOG("get_data_handle : handle : %d",handle);
     LOG("%c",getc(handle));
+=======
+//    LOG("%d",(block * BLOCKSIZE) + offset);
+
+>>>>>>> Restructure dump_data, move things around
     return handle;
     END("*get_data_handle");
 }
@@ -94,24 +98,22 @@ void dump_data()
 
     LOG("\n\n>>>>>>>>>>>>>>>>>>");
     LOG("\nFILE METADATA:");
-    for(inode_t inode = 0; inode < file_count; inode++)
+    LOG("\tused\tfirst\tis_dir\tpath");
+    for(inode_t inode = 0; inode < NUM_FILES; inode++)
     {
         LOG("File %d:", inode);
-        LOG1("used:%d", files[inode].used);
-        LOG1("first:%d", files[inode].start_block);
-        LOG1("path:%s", files[inode].path);
-        LOG1("is_dir:%d", files[inode].is_dir);
+        LOG("\t%d\t%d\t%d\t%s", files[inode].used,files[inode].start_block,files[inode].is_dir,files[inode].path);
     }
 
     LOG("\n\n>>>");
 
     LOG("\nBLOCK METADATA:");
+    LOG("\tblockno\tallocated\tnext\tdata");
     for (blockno_t block = 0; block < NUM_BLOCKS; block++)
     {
-        LOG("Block %d:", block);
-        LOG1("allocated:%d", blocks[block].allocated);
-        LOG1("next:%d", blocks[block].next);
-
+        FILE* h = get_data_handle(block, 0);
+        char data[BLOCKSIZE];
+        LOG1("\t%d\t%d\t%d\t%s", block, blocks[block].allocated, blocks[block].next,data);
     }
     LOG("\n>>>>>>>>>>>>>>>>>>\n\n");
 }
