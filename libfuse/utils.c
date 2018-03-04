@@ -47,8 +47,9 @@ FILE *get_data_handle(blockno_t block, offset_t offset)
     FILE *handle = fopen(backing_storage_path, "rw+b");
     LOG("fseek");
     fseek(handle, (block * BLOCKSIZE) + offset, blocks_origin);
-    LOG("%d",(block * BLOCKSIZE) + offset);
-
+    LOG("%d , %d",(block * BLOCKSIZE) + offset,blocks_origin);
+    LOG("get_data_handle : handle : %d",handle);
+    LOG("%c",getc(handle));
     return handle;
     END("*get_data_handle");
 }

@@ -10,22 +10,18 @@
 
 static struct fuse_operations operations =
 {
-    // File operations
+    .getattr = do_getattr,
+    .readdir = do_readdir,
     .read = do_read,
     .truncate = do_truncate,
     .write = do_write,
     .create = do_create,
+    .mkdir = do_mkdir,
     .mknod = do_create,
-    //Stat operations
-    .getattr = do_getattr,
-    .setxattr = do_setxattr,
-    .utimens = do_utimens,
     .access = do_access,
-    //Directory operations
-    .readdir = do_readdir,
+    .setxattr = do_setxattr,
     .unlink = do_unlink,
     .rmdir = do_unlink,
-    .mkdir = do_mkdir,
 };
 
 

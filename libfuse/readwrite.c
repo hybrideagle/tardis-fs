@@ -25,6 +25,9 @@ int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
     }
     // start reading data
     FILE *handle;
+    char c;
+    char temp_buf[100];
+    int buf_size = 0;
     while (bytes > 0)
     {
         handle = get_data_handle(block, offset);
@@ -32,17 +35,31 @@ int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
         offset = 0;
         for (int i = 0; i < BLOCKSIZE && bytes > 0; i++)
         {
-            *(buffer++) = fgetc(handle);
-            LOG("buffer : %s",buffer);
+            assertd(buffer!=NULL);
+            assertd(buffer+1 != NULL);
+            assertd(handle!=NULL);
+            //buffer = getc(handle);
+            //LOG("buffer : %s",buffer);
+            c = getc(handle);
+            LOG("%c",c);
+            temp_buf[buf_size] = c;
+            buf_size++;
             bytes--;
         }
         fclose(handle);
+        //return 0;
+        LOG("read_from_block : Calling get_next_block");
         block = get_next_block(block);
         if (block==-1)
         {
-          return 0;
+          LOG("read_from_block : write to buffer (0)");
+          strcpy(buffer,strdup(temp_buf));
+          LOG("buffer = %s",temp_buf);
+          return buf_size;
         }
     }
+    LOG("read_from_block : write to buffer (00)");
+    strcpy(buffer,strdup(temp_buf));
     return 0;
 
     END("read_from_block");
@@ -75,7 +92,6 @@ int write_to_block(blockno_t block, offset_t offset, char *buffer, int bytes)
     {
         handle = get_data_handle(block, offset);
         offset = 0;
-        LOG("%s",handle);
         for (int i = 0; i < BLOCKSIZE && bytes > 0; i++)
         {
             fputc(*buffer++, handle);
@@ -97,8 +113,9 @@ int read_from_path(char *path, offset_t offset, char *buffer, int bytes)
     numassert(bytes >= 0, bytes);
 
     START("read_from_path");
-    return read_from_block(get_first_block_from_path(path), offset, buffer, bytes);
-
+    int ret =  read_from_block(get_first_block_from_path(path), offset, buffer, bytes);
+    LOG("read_from_path : %s",buffer);
+    return ret;
     END("read_from_path");
 }
 

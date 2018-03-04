@@ -82,8 +82,3 @@ int do_setxattr(char *path, size_t size)
     LOG("do_setattr passthrough\n");
     return 0;
 }
-
-int do_utimens(const char* path, const struct timespec ts)
-{
-    return 0;
-}

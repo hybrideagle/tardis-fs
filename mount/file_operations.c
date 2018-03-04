@@ -35,11 +35,11 @@ int do_read(char *path, char *buffer, size_t size, off_t offset, struct fuse_fil
        }
        memcpy( buffer, selectedText + offset, size );
        return strlen( selectedText ) - offset;*/
-    char *selectedText;
+    char selectedText[100];
     size = 10;
-    return read_from_path(path, offset, selectedText, size);
+    read_from_path(path, offset, &selectedText, size);
     memcpy( buffer, selectedText + offset, size );
-    LOG("%s",buffer);
+    LOG("read : %s",buffer);
     return strlen( selectedText ) - offset;
 }
 
