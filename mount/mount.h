@@ -18,5 +18,6 @@ int getinode(char *path);
 int isd(inode_t inode);
 int rmv(char *path);
 char* get_path(inode_t inode);
+int do_utimens(const char* path, const struct timespec ts);
 
 #endif
