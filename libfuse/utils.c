@@ -46,14 +46,12 @@ FILE *get_data_handle(blockno_t block, offset_t offset)
     assert(backing_storage_path != NULL);
     FILE *handle = fopen(backing_storage_path, "rw+b");
     fseek(handle, (block * BLOCKSIZE) + offset, blocks_origin);
-<<<<<<< HEAD
+
     LOG("%d , %d",(block * BLOCKSIZE) + offset,blocks_origin);
     LOG("get_data_handle : handle : %d",handle);
     LOG("%c",getc(handle));
-=======
-//    LOG("%d",(block * BLOCKSIZE) + offset);
 
->>>>>>> Restructure dump_data, move things around
+//    LOG("%d",(block * BLOCKSIZE) + offset);
     return handle;
     END("*get_data_handle");
 }
