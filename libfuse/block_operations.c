@@ -93,11 +93,13 @@ blockno_t get_first_free_block()
         if (blocks[i].allocated == false)
         {
             blocks[i].allocated = true;
+
             FILE* handle = get_data_handle(i,0);
             for (size_t i = 0; i < BLOCKSIZE; i++) {
                 fputc('\0', handle);
             }
             fclose(handle);
+
             return i;
         }
     }
