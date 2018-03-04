@@ -11,6 +11,7 @@ int do_access(char *path, int mask);
 int do_setxattr(char *path, size_t size);
 int do_mkdir(char *path, mode_t mode);
 int do_unlink(char *path);
+int do_utimens(const char* path, const struct timespec t);
 int main(int argc, char *argv[]);
 void insert(char *path, int mode);
 void iwrite(int inode, char *text);
