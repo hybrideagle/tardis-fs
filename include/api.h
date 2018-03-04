@@ -12,6 +12,7 @@ extern int delete_dir(char* path);
 
 void display();
 void sanity_check();
+void dump_data();
 
 void nullify_path_array(char* path);
 
@@ -42,6 +43,6 @@ extern void sync();
 
 // Initializes the backing store, using the given path to the backing store file.
 // Should be called at the beginning of main.
-extern void init_tfs();
+extern void init_tfs(char* path, bool read_from_backing_storage);
 
 #endif //API_H
