@@ -14,6 +14,8 @@
 
 #include "defs.h"
 #include "api.h"
+#include "log.h"
+//#include "log_disabled.h"
 
 /* Structure of the backing storage:
     The backing storage should contain binary data in the form:
