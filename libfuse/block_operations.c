@@ -71,6 +71,7 @@ blockno_t get_or_create_next_block(blockno_t blockno)
                 numassert(blocks[next].next == -1, blocks[next].next);
                 blocks[blockno].next = next;
                 blocks[next].allocated = true;
+                break;
             }
         }
     }
