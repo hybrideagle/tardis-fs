@@ -6,6 +6,7 @@ echo "##########################"
 echo "Setting up filesystem..."
 ./mkfs.tfs ./blargh
 mkdir x
+clear
 echo "##########################"
 echo "Mounting filesystem..."
-./mount.tfs -f ./x 
+./mount.tfs -f ./x
