@@ -8,6 +8,7 @@ link_args = ['-lfuse','-pthread']
 subdir('libfuse')
 subdir('mount')
 subdir('mkfs')
+subdir('examine')
 
 # Build the shared object for libfuse
 libfuse = shared_library('libfuse', libfuse_sources)
@@ -17,6 +18,9 @@ libfuse_includes = include_directories('include')
 mkfs_name = 'mkfs.tfs'
 mkfs_exe = executable(mkfs_name, mkfs_sources, cpp_args: cpp_args, link_args: link_args, include_directories: libfuse_includes, link_with: libfuse)
 
+# set up the examine executable
+mkfs_exe = executable('examine', examine_sources, cpp_args: cpp_args, link_args: link_args, include_directories: libfuse_includes, link_with: libfuse)
+
 # Set up building the mount.tfs executable
 mount_name = 'mount.tfs'
 mount_exe = executable(mount_name, mount_sources, cpp_args: cpp_args, link_args: link_args, include_directories: libfuse_includes, link_with: libfuse)
@@ -24,3 +28,4 @@ mount_exe = executable(mount_name, mount_sources, cpp_args: cpp_args, link_args:
 # Set up some convenience scripts
 run_target('run', command:'scripts/run.sh', depends: mount_exe)
 run_target('wc', command:'scripts/wc.sh', depends: mount_exe)
+run_target('mk', command:'scripts/mk.sh', depends: mount_exe)
