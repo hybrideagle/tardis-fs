@@ -29,3 +29,4 @@ mount_exe = executable(mount_name, mount_sources, cpp_args: cpp_args, link_args:
 run_target('run', command:'scripts/run.sh', depends: mount_exe)
 run_target('wc', command:'scripts/wc.sh', depends: mount_exe)
 run_target('mk', command:'scripts/mk.sh', depends: mount_exe)
+run_target('test1', command:'scripts/test1.sh', depends: mount_exe)
