@@ -28,10 +28,12 @@ int read_from_block(blockno_t block, offset_t offset, char *buffer, int bytes)
     while (bytes > 0)
     {
         handle = get_data_handle(block, offset);
+        LOG("read_from_block : handle : %d",handle);
         offset = 0;
         for (int i = 0; i < BLOCKSIZE && bytes > 0; i++)
         {
             *(buffer++) = fgetc(handle);
+            LOG("buffer : %s",buffer);
             bytes--;
         }
         fclose(handle);

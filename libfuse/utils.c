@@ -45,9 +45,11 @@ FILE *get_data_handle(blockno_t block, offset_t offset)
     numassert(block >= 0 && block < NUM_BLOCKS, block);
     assert(valid_path(backing_storage_path));
     FILE *handle = fopen(backing_storage_path, "rw+b");
+    LOG("fseek");
     fseek(handle, (block * BLOCKSIZE) + offset, blocks_origin);
-    return handle;
+    LOG("%d",(block * BLOCKSIZE) + offset);
 
+    return handle;
     END("*get_data_handle");
 }
 
