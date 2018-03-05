@@ -78,7 +78,6 @@ static int tfs_opt_proc(void *data, const char *arg, int key, struct fuse_args *
 int main(int argc, char *argv[])
 {
     init_tfs(NULL,true);
-    dump_data();
     init_logging();
     START("main");
     //numassert(argc >= 3, argc);
@@ -100,13 +99,17 @@ int main(int argc, char *argv[])
     sanity_check();
     dump_data();
     LOG1("Done creating up initial files, writing data");
-    iwrite(2, "Heyyy");
+    //iwrite(2, "Heyyy");
     iwrite(3, "Hi");
     LOG1("Done setting up initial files");
 
     //sanity_check();
-    //dump_data();
-
-    LOG1("Deferring to fuse_main...");
-    return fuse_main(args.argc, args.argv, &operations, NULL);
+    dump_data();
+    sync_metadata();
+//    char d[10];
+//    read_from_path("/file1", 0, d, 10);
+//    LOG("data:%s",d);
+//    assert(d[0]!='\0');
+//    LOG1("Deferring to fuse_main...");
+    //return fuse_main(args.argc, args.argv, &operations, NULL);
 }

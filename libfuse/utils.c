@@ -40,7 +40,7 @@ bool valid_path(char* path)
 */
 FILE *get_data_handle(blockno_t block, offset_t offset)
 {
-    START("*get_data_handle");
+    //START("*get_data_handle");
     numassert(offset >= 0 && offset < BLOCKSIZE, offset);
     numassert(block >= 0 && block < NUM_BLOCKS, block);
     assert(backing_storage_path != NULL);
@@ -96,22 +96,22 @@ void dump_data()
 
     LOG("\n\n>>>>>>>>>>>>>>>>>>");
     LOG("\nFILE METADATA:");
-    LOG("\tused\tfirst\tis_dir\tpath");
+    LOG("\tinode\tused\tfirst\tis_dir\tpath");
     for(inode_t inode = 0; inode < NUM_FILES; inode++)
     {
-        LOG("File %d:", inode);
-        LOG("\t%d\t%d\t%d\t%s", files[inode].used,files[inode].start_block,files[inode].is_dir,files[inode].path);
+        LOG("\t%d\t%d\t%d\t%d\t%s", inode, files[inode].used,files[inode].start_block,files[inode].is_dir,files[inode].path);
     }
 
     LOG("\n\n>>>");
 
     LOG("\nBLOCK METADATA:");
-    LOG("\tblockno\tallocated\tnext\tdata");
+    LOG("\tblockno\tallocated\tnext\tdata\tlen");
     for (blockno_t block = 0; block < NUM_BLOCKS; block++)
     {
         FILE* h = get_data_handle(block, 0);
         char data[BLOCKSIZE];
-        LOG1("\t%d\t%d\t%d\t%s", block, blocks[block].allocated, blocks[block].next,data);
+        read_from_block(block, 0, data, BLOCKSIZE);
+        LOG1("\t%d\t%d\t%d\t%s\t%d", block, blocks[block].allocated, blocks[block].next,data,strlen(data));
     }
     LOG("\n>>>>>>>>>>>>>>>>>>\n\n");
 }

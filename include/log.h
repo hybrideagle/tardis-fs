@@ -6,11 +6,18 @@ void init_logging();
 FILE* log_file;
 
 // Logging macros and constants
-//#define START(args...) printf("(%s)[START]", __FILE__);printf(args);fflush(stdout);printf("\n");
-#define START(args...) 
+#define START(args...) printf("(%s)[START]", __FILE__);printf(args);fflush(stdout);printf("\n");
+//#define START(args...)
 #define END(args...)   printf("[END]");printf(args);fflush(stdout);printf("\n");
 #define LOG(args...)   printf("\t");printf(args);fflush(stdout);printf("\n");
 #define LOG1(args...)  printf("\t\t");printf(args);fflush(stdout);printf("\n");
+
+//#define START(args...)
+//#define END(args...)
+#define LOGNULL(args...)
+#define LOGNULL1(args...)
+//#define LOG1(args...)
+
 
 //Delimited assert
 #define assertd(x) if(!(x))printf("\n\n###########\n");assert(x);

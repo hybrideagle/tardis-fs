@@ -6,14 +6,14 @@ int do_readdir(char *path, void *buffer, fuse_fill_dir_t filler, off_t offset, s
 {
     START("do_readdir");
     int i, j, count, root = 0;
-    LOG("--> Getting The List of Files of %s\n", path);
+    LOGNULL("--> Getting The List of Files of %s\n", path);
     display();
     for (i = 0; i < file_count; i++)
     {
         root = 0, count = 0;
         for (j = 0; j < strlen(get_path(i)); j++)
         {
-            LOG("Testing : %d\t%c|\n", get_path(i)[j] - '/', get_path(i)[j]);
+            LOGNULL("Testing : %d\t%c|\n", get_path(i)[j] - '/', get_path(i)[j]);
             if (get_path(i)[j] == '/')
             {
                 count++;
@@ -23,7 +23,7 @@ int do_readdir(char *path, void *buffer, fuse_fill_dir_t filler, off_t offset, s
         {
             root = 1;
         }
-        LOG("\nROOT = %d\n", root);
+        LOGNULL("\nROOT = %d\n", root);
         count = 0;
         for (j = 0; j < strlen(path) - 1; j++)
         {
@@ -47,7 +47,7 @@ int do_readdir(char *path, void *buffer, fuse_fill_dir_t filler, off_t offset, s
                 c1++;
             }
         }
-        LOG("%s - %d\n", path, c1);
+        LOGNULL("%s - %d\n", path, c1);
         for (j = 0; j < strlen(get_path(i)); j++)
         {
             if (get_path(i)[j] - '/' == 0)
@@ -63,7 +63,7 @@ int do_readdir(char *path, void *buffer, fuse_fill_dir_t filler, off_t offset, s
         {
             c1--;
         }
-        LOG("%s - %d\n", get_path(i), c2);
+        LOGNULL("%s - %d\n", get_path(i), c2);
         if (c2 - c1 > 1)
         {
             count += 1000;
@@ -71,11 +71,11 @@ int do_readdir(char *path, void *buffer, fuse_fill_dir_t filler, off_t offset, s
 
         if (files[i].used==false)
         {
-            LOG("Check Path >> %s\n", path);
+            LOGNULL("Check Path >> %s\n", path);
             count += 100000;
         }
 
-        LOG("\nMismatch = %d\n_____________________\n", count);
+        LOGNULL("\nMismatch = %d\n_____________________\n", count);
         if (((strcmp(path, "/") == 0 && root) || count == 0) && (count < 100000))
         {
             for (j = strlen(get_path(i)) - 1; j >= 0; j--)
@@ -85,7 +85,7 @@ int do_readdir(char *path, void *buffer, fuse_fill_dir_t filler, off_t offset, s
                     break;
                 }
             }
-            LOG("Show > %s , %d\n", get_path(i), j);
+            LOGNULL("Show > %s , %d\n", get_path(i), j);
 
             int s = j;
             char temp;
@@ -94,16 +94,16 @@ int do_readdir(char *path, void *buffer, fuse_fill_dir_t filler, off_t offset, s
                 char temp[strlen(get_path(i)) - j];
                 for (j = 0; j < strlen(get_path(i)) - j - 1; j++)
                 {
-                    LOG("Buffering %c\n", strdup(get_path(j))[j + s + 1]);
+                    LOGNULL("Buffering %c\n", strdup(get_path(j))[j + s + 1]);
                     temp[j] = strdup(get_path(i))[j + s + 1];
                 }
                 temp[j] = '\0';
-                LOG("Individual entry : %s\n\n", temp);
+                LOGNULL("Individual entry : %s\n\n", temp);
                 filler(buffer, strdup(temp), NULL, 0);
             }
             else
             {
-                LOG("%s\n\n", get_path(i));
+                LOGNULL("%s\n\n", get_path(i));
                 filler(buffer, strdup(get_path(i)), NULL, 0);
             }
         }
@@ -114,7 +114,7 @@ int do_readdir(char *path, void *buffer, fuse_fill_dir_t filler, off_t offset, s
         }
         */
     }
-    LOG("RETURN 0\n");
+    LOGNULL("RETURN 0\n");
     return 0;
 }
 
@@ -122,7 +122,7 @@ int do_mkdir(char *path, mode_t mode)
 {
     START("do_mkdir");
     mode = O_CREAT;
-    LOG("Mkdir Called\n");
+    LOGNULL("Mkdir Called\n");
     files[file_count].is_dir = true;
     int i;
     char path2[PATH_LENGTH];
@@ -147,10 +147,10 @@ int do_mkdir(char *path, mode_t mode)
 int do_unlink(char *path)
 {
     START("do_unlink");
-    LOG("Unlink called.\n");
+    LOGNULL("Unlink called.\n");
     rmv(strdup(path));
-    //LOG(">>%d\n", dir[getinode(path)]);
-    LOG(">>%d\n", files[getinode(path)].is_dir);
+    //LOGNULL(">>%d\n", dir[getinode(path)]);
+    LOGNULL(">>%d\n", files[getinode(path)].is_dir);
     display();
     return 0;
 }

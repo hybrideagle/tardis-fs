@@ -5,8 +5,8 @@ int do_getattr(char *path, struct stat *st)
 {
     assertd(path != NULL);
     START("do_getattr");
-    LOG("[getattr] Called\n");
-    LOG("\tAttributes of %s requested\n", path);
+    LOGNULL("[getattr] Called\n");
+    LOGNULL("\tAttributes of %s requested\n", path);
     st->st_uid = getuid();
     st->st_gid = getgid();
     st->st_atime = time(NULL);
@@ -19,32 +19,32 @@ int do_getattr(char *path, struct stat *st)
         return 0;
     }
     int inode = getinode(strdup(path));
-    LOG("\tAttributes of %s[inode : %d] requested\n", path, inode);
-    LOG("ISD = %d\n", isd(inode));
+    LOGNULL("\tAttributes of %s[inode : %d] requested\n", path, inode);
+    LOGNULL("ISD = %d\n", isd(inode));
     if (isd(inode) == 1)
     {
-        LOG("DIRECTORY\n");
+        LOGNULL("DIRECTORY\n");
         st->st_mode = S_IFDIR | 0777;
         st->st_nlink = 2;
-        LOG("RETURNING 0\n");
+        LOGNULL("RETURNING 0\n");
         return 0;
     }
     else if (isd(inode) == 0)
     {
-        LOG("REGULAR\n");
+        LOGNULL("REGULAR\n");
         st->st_mode = S_IFREG | 0777;
         st->st_nlink = 1;
         st->st_size = 1024;
-        LOG("RETURNING 0\n");
+        LOGNULL("RETURNING 0\n");
         return 0;
     }
     else if (isd(inode) == -1)
     {
-        LOG("REGULAR\n");
+        LOGNULL("REGULAR\n");
         st->st_mode = S_IFREG | 0777;
         st->st_nlink = 1;
         st->st_size = 1024;
-        LOG("RETURNING NOENT\n");
+        LOGNULL("RETURNING NOENT\n");
         return -ENOENT;
     }
     int i = 0, j = 0;
@@ -56,7 +56,7 @@ int do_getattr(char *path, struct stat *st)
         char *fpath2 = fpath;
         if (strcmp(path, fpath2) == 0)
         {
-            LOG("RETURNING 0\n");
+            LOGNULL("RETURNING 0\n");
             return 0;
         }
         for (j = 0; j < 10; j++)
@@ -64,14 +64,14 @@ int do_getattr(char *path, struct stat *st)
             fpath[j] = '\0';
         }
     }
-    LOG("RETURNING NOENT\n");
+    LOGNULL("RETURNING NOENT\n");
     return -ENOENT;
 }
 
 int do_access(char *path, int mask)
 {
     START("do_access");
-    LOG("do_access passthrough\n");
+    LOGNULL("do_access passthrough\n");
     return 0;
 }
 
@@ -79,7 +79,7 @@ int do_setxattr(char *path, size_t size)
 {
     START("do_setxattr");
     size = 1024;
-    LOG("do_setattr passthrough\n");
+    LOGNULL("do_setattr passthrough\n");
     return 0;
 }
 

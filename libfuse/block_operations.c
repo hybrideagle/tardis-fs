@@ -45,8 +45,8 @@ blockno_t get_first_block_from_inode(inode_t inode)
 blockno_t get_next_block(blockno_t blockno)
 {
     assertd(blockno >= 0 && blockno < NUM_BLOCKS);
-    START("get_next_block");
-    END("get_next_block");
+    //START("get_next_block");
+    //END("get_next_block");
     return blocks[blockno].next;
 }
 

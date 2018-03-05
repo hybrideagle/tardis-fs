@@ -6,7 +6,7 @@ int do_read(char *path, char *buffer, size_t size, off_t offset, struct fuse_fil
     START("do_read");
 
     /*int i,j;
-       LOG( "--> Trying to read %s, %lu, %lu\n", path, offset, size );
+       LOG( "--> Trying to read %s, %lu, %lu", path, offset, size );
        char *selectedText = NULL;
 
        for(i=0; i<file_count; i++)
@@ -25,12 +25,12 @@ int do_read(char *path, char *buffer, size_t size, off_t offset, struct fuse_fil
                     fpath[j]='\0';
             }
        }
-       LOG("\n%s\n",selectedText);
+       LOG("%s",selectedText);
 
        if(selectedText == NULL)
        {
 
-            LOG("RETURN -1\n");
+            LOG("RETURN -1");
             return -1;
        }
        memcpy( buffer, selectedText + offset, size );
@@ -46,7 +46,7 @@ int do_read(char *path, char *buffer, size_t size, off_t offset, struct fuse_fil
 int do_truncate(char *path, off_t offset, struct fuse_file_info *fi)
 {
     START("do_truncate");
-    LOG("RETURN 0\n");
+    LOG("RETURN 0");
     return 0;
 }
 
@@ -57,7 +57,7 @@ int do_write(char *path, char *buffer, size_t size, off_t offset, struct fuse_fi
 /*
         int i,j;
         offset = 0;
-        LOG("\nWrite Operation\n");
+        LOG("Write Operation");
         for(i=0; i<file_count; i++)
         {
                 char fpath[PATH_LENGTH];
@@ -68,9 +68,9 @@ int do_write(char *path, char *buffer, size_t size, off_t offset, struct fuse_fi
                 {
                         content[i] = strdup(buffer);
                         size = strlen(buffer);
-                        LOG("Trying to write to file\n");
+                        LOG("Trying to write to file");
 
-                        LOG("RETURN SIZE %ld\n",size);
+                        LOG("RETURN SIZE %ld",size);
                         return size;
                         break;
                 }
@@ -96,21 +96,21 @@ int do_create(char *path, mode_t mode, struct fuse_file_info *fi)
         path2[i] = path[i + 1];
     }
     path2[i] = '\0';
-    LOG("\nTrying to create file %s\n", path2);
+    LOG("Trying to create file %s", path2);
     for (i = 0; i < file_count; i++)
     {
         if (strcmp(strdup(get_path(i)), strdup(path2)) == 0)
         {
-            LOG("\nFile already exists.\n");
+            LOG("File already exists.");
             break;
         }
         else
         {
 //                        dir[file_count] = 1;
             insert(strdup(path2), 0);
-            LOG("Insert Command Executed\n");
+            LOG("Insert Command Executed");
 
-            LOG("RETURN 0\n");
+            LOG("RETURN 0");
             return 0;
         }
     }
