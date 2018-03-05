@@ -15,6 +15,7 @@ void write_backing_storage(char* path)
     init_tfs(NULL, false);
     blocks[3].allocated = true;
     open_backing_storage_file(path);
+
     sync_metadata();
 
     //sync_metadata();

@@ -77,6 +77,6 @@ void sync_metadata()
     START("sync");
     pwrite(fileno(backing_storage), files, sizeof(files), files_origin);
     pwrite(fileno(backing_storage), blocks, sizeof(blocks), blocks_origin);
-    fsync(fileno(backing_storage));
+    //fsync(fileno(backing_storage));
     END("sync");
 }

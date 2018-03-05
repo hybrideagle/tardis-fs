@@ -4,15 +4,8 @@
 Setup the inital values of files and blocks
 */
 
-void open_backing_storage_file(char* path)
-{
-    backing_storage_path = path;
-    backing_storage = fopen(path,"w+b");
-}
-
 void dump_all_data(char* path)
 {
-    open_backing_storage_file(path);
     printf("\nsizeof(block):%d",sizeof(block));
     printf("\nsizeof(file):%d",sizeof(file));
     printf("\nUsing block offset:%d",blocks_origin);
@@ -32,6 +25,8 @@ void print_usage()
 
 int main(int argc, char**argv)
 {
+    init_tfs(argv[1], true);
+    LOG("done with init");
     if(argc != 2){
         print_usage();
         return -1;
